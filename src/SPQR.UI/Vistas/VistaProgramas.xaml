@@ -1,0 +1,36 @@
+<UserControl x:Class="SPQR.UI.Vistas.VistaProgramas"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{StaticResource Linea2}" BorderThickness="0,0,0,1"
+                Padding="24,16,24,12">
+            <StackPanel>
+                <TextBlock Text="Configuración de programas" Style="{StaticResource Titulo}"/>
+                <TextBlock Style="{StaticResource Subtitulo}"
+                           Text="Catálogo de programas con todos los registros que usan los algoritmos. Se define una vez; después se instancian en la lista de ejecución."/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="24,14,24,10">
+            <Button Content="+ Agregar programa" Style="{StaticResource BotonPrimario}" Click="Agregar_Click"/>
+            <Button Content="Duplicar" Style="{StaticResource BotonPlano}" Click="Duplicar_Click"/>
+            <Button Content="Quitar" Style="{StaticResource BotonPlano}" Click="Quitar_Click"/>
+            <TextBlock Style="{StaticResource Pista}" Margin="12,0,0,0"
+                       Text="Las listas del núcleo son listas enlazadas con apuntadores, no colecciones del lenguaje."/>
+        </StackPanel>
+
+        <Border Style="{StaticResource Tarjeta}" Margin="24,0,24,20">
+            <DataGrid x:Name="Tabla" ItemsSource="{Binding Programas}" IsReadOnly="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="60"/>
+                    <DataGridTextColumn Header="NOMBRE" Binding="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                    <DataGridTextColumn Header="PÁGINAS" Binding="{Binding TamanioEnPaginas, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                    <DataGridTextColumn Header="CADENA DE REFERENCIAS" Binding="{Binding CadenaTexto, UpdateSourceTrigger=LostFocus}" Width="*"/>
+                    <DataGridTextColumn Header="PRIORIDAD" Binding="{Binding Prioridad, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                    <DataGridTextColumn Header="BOLETOS" Binding="{Binding Boletos, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                    <DataGridTextColumn Header="% ASIGNACIÓN" Binding="{Binding PorcentajeAsignacion, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,213 @@
+<UserControl x:Class="SPQR.UI.Vistas.VistaEmulacion"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="Kpi" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Linea}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="7"/>
+            <Setter Property="Padding" Value="11,9"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+        <Style x:Key="KpiRotulo" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="9.5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink3}"/>
+        </Style>
+        <Style x:Key="KpiValor" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="19"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource Navy}"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{StaticResource Linea2}" BorderThickness="0,0,0,1"
+                Padding="24,16,24,12">
+            <StackPanel>
+                <TextBlock Text="Emular MMU" Style="{StaticResource Titulo}"/>
+                <TextBlock Style="{StaticResource Subtitulo}"
+                           Text="Reproducción paso a paso. Los paneles están sincronizados por el mismo instante de tiempo."/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,14,24,20">
+            <StackPanel>
+
+                <!-- reproductor -->
+                <Border Background="{StaticResource Panel}" BorderBrush="{StaticResource Linea}"
+                        BorderThickness="1" CornerRadius="7" Padding="12,9">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="⏮" Style="{StaticResource BotonPlano}" Command="{Binding AlPrincipio}" Width="34"/>
+                            <Button Content="◀" Style="{StaticResource BotonPlano}" Command="{Binding Retroceder}" Width="34"/>
+                            <Button Content="{Binding TextoBotonReproducir}" Style="{StaticResource BotonPrimario}"
+                                    Command="{Binding Reproducir}" MinWidth="92"/>
+                            <Button Content="▶" Style="{StaticResource BotonPlano}" Command="{Binding Avanzar}" Width="34"/>
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="1" Style="{StaticResource Pista}" MinWidth="86"
+                                   Margin="10,0" Text="{Binding PosicionTexto}"/>
+
+                        <Slider Grid.Column="2" VerticalAlignment="Center" Minimum="0"
+                                Maximum="{Binding InstanteFinal}" Value="{Binding Instante, Mode=TwoWay}"
+                                IsSnapToTickEnabled="True" TickFrequency="1" Margin="8,0"/>
+
+                        <StackPanel Grid.Column="3" Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource Pista}" Text="Velocidad" Margin="0,0,7,0"/>
+                            <ComboBox SelectedIndex="1" Width="74" SelectionChanged="Velocidad_Changed">
+                                <ComboBoxItem Content="0.5×"/>
+                                <ComboBoxItem Content="1×"/>
+                                <ComboBoxItem Content="2×"/>
+                                <ComboBoxItem Content="4×"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- indicadores -->
+                <UniformGrid Columns="5" Margin="0,14,0,0">
+                    <Border Style="{StaticResource Kpi}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="EN CPU"/>
+                            <TextBlock Style="{StaticResource KpiValor}" Text="{Binding EnCpu}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Kpi}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="PÁGINA REFERENCIADA"/>
+                            <TextBlock Style="{StaticResource KpiValor}" FontSize="14" Text="{Binding PaginaRef}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Kpi}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="FALLOS"/>
+                            <TextBlock Style="{StaticResource KpiValor}" FontSize="15" Text="{Binding FallosTexto}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Kpi}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="RENDIMIENTO = 1 − F"/>
+                            <TextBlock Style="{StaticResource KpiValor}" Text="{Binding RendimientoTexto}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Kpi}" Margin="0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="MARCOS EN USO"/>
+                            <TextBlock Style="{StaticResource KpiValor}" Text="{Binding MarcosTexto}"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <!-- administrador de tareas -->
+                <Border Style="{StaticResource Tarjeta}" Margin="0,14,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="PROCESOS · VISTA DE ADMINISTRADOR DE TAREAS"/>
+                        <DataGrid ItemsSource="{Binding Tareas}" MaxHeight="220">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="PROCESO" Binding="{Binding Nombre}" Width="*"/>
+                                <DataGridTextColumn Header="ESTADO" Binding="{Binding Estado}" Width="120"/>
+                                <DataGridTextColumn Header="CPU %" Binding="{Binding Cpu}" Width="80"/>
+                                <DataGridTextColumn Header="MEMORIA (KB)" Binding="{Binding MemoriaKb}" Width="120"/>
+                                <DataGridTextColumn Header="MARCOS" Binding="{Binding MarcosTexto}" Width="90"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+
+                <Grid Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.1*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- mapa de marcos -->
+                    <Border Grid.Column="0" Style="{StaticResource Tarjeta}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource TituloTarjeta}" Text="MAPA DE MARCOS · MEMORIA FÍSICA"/>
+                            <ItemsControl ItemsSource="{Binding Marcos}" Margin="12,0,12,12">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate><UniformGrid Columns="4"/></ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="celda" Margin="3" Padding="7,8" CornerRadius="5"
+                                                Background="White" BorderBrush="{StaticResource Linea}" BorderThickness="1">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding Etiqueta}" FontSize="9.5" FontFamily="{StaticResource Mono}"
+                                                           Foreground="{StaticResource Ink3}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Contenido}" FontSize="12.5" FontWeight="Bold"
+                                                           FontFamily="{StaticResource Mono}" HorizontalAlignment="Center"
+                                                           Foreground="{StaticResource Navy}"/>
+                                                <TextBlock Text="{Binding Bits}" FontSize="9" FontFamily="{StaticResource Mono}"
+                                                           Foreground="{StaticResource Ink3}" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding Contenido}" Value="libre">
+                                                <Setter TargetName="celda" Property="Background" Value="{StaticResource Panel}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding EsVictima}" Value="True">
+                                                <Setter TargetName="celda" Property="Background" Value="{StaticResource BadBg}"/>
+                                                <Setter TargetName="celda" Property="BorderBrush" Value="{StaticResource Bad}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Style="{StaticResource Pista}" Margin="12,0,12,12" TextWrapping="Wrap"
+                                       Text="R = referenciada · M = modificada · rojo = marco donde acaba de ocurrir un desalojo"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- tabla de páginas -->
+                    <Border Grid.Column="2" Style="{StaticResource Tarjeta}">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}" Text="TABLA DE PAGINACIÓN"/>
+                            <ComboBox DockPanel.Dock="Top" Margin="12,0,12,10"
+                                      ItemsSource="{Binding Procesos}" DisplayMemberPath="Nombre"
+                                      SelectedItem="{Binding ProcesoObservado, Mode=TwoWay}"/>
+                            <DataGrid ItemsSource="{Binding TablaDePaginas}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="PÁGINA" Binding="{Binding Pagina}" Width="*"/>
+                                    <DataGridTextColumn Header="PRESENTE" Binding="{Binding PresenteTexto}" Width="*"/>
+                                    <DataGridTextColumn Header="MARCO" Binding="{Binding Marco}" Width="*"/>
+                                    <DataGridTextColumn Header="R" Binding="{Binding BitR}" Width="40"/>
+                                    <DataGridTextColumn Header="M" Binding="{Binding BitM}" Width="40"/>
+                                    <DataGridTextColumn Header="CLASE" Binding="{Binding Clase}" Width="60"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+
+                <!-- log -->
+                <Border Style="{StaticResource Tarjeta}" Margin="0,14,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="LOG DE EVENTOS · HISTORIAL COMPLETO DE LA CORRIDA"/>
+                        <DataGrid ItemsSource="{Binding Log}" MaxHeight="220">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="T" Binding="{Binding Instante}" Width="50"/>
+                                <DataGridTextColumn Header="PROCESO" Binding="{Binding Proceso}" Width="160"/>
+                                <DataGridTextColumn Header="DETALLE" Binding="{Binding Detalle}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,128 @@
+<UserControl x:Class="SPQR.UI.Vistas.VistaConfiguracion"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="Campo" TargetType="Grid">
+            <Setter Property="Margin" Value="0,0,0,7"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{StaticResource Linea2}" BorderThickness="0,0,0,1"
+                Padding="24,16,24,12">
+            <StackPanel>
+                <TextBlock Text="Configuración SO" Style="{StaticResource Titulo}"/>
+                <TextBlock Style="{StaticResource Subtitulo}"
+                           Text="Parámetros de la máquina simulada. Las magnitudes derivadas se recalculan al escribir."/>
+            </StackPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom" Padding="24,10,24,16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Simular →" Style="{StaticResource BotonPrimario}"
+                        Command="{Binding Simular}" Padding="16,6"/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Margin="24,16,24,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="13"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="13"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource Tarjeta}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TituloTarjeta}" Text="CPU"/>
+                        <StackPanel Margin="12,0,12,12">
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Quantum" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.Quantum, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Reinicio del bit R" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.IntervaloReinicioBitR, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <TextBlock Style="{StaticResource Pista}" Text="Unidad de tiempo: 1 tick" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource Tarjeta}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TituloTarjeta}" Text="MEMORIA"/>
+                        <StackPanel Margin="12,0,12,12">
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="RAM autorizada (KB)" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.MemoriaRamKb, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Páginas virtuales" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.PaginasVirtuales, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Marcos físicos" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.MarcosFisicos, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Tamaño de página (KB)" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.TamanioPaginaKb, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="4" Style="{StaticResource Tarjeta}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TituloTarjeta}" Text="ALMACENAMIENTO"/>
+                        <StackPanel Margin="12,0,12,12">
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Discos duros" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.DiscosDuros, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <Grid Style="{StaticResource Campo}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Área de intercambio" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.AreaDeIntercambio, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <TextBlock Style="{StaticResource Pista}" Margin="0,4,0,0"
+                                       Text="{Binding Config.RelacionVirtualFisico, StringFormat='Relación V:F = {0} : 1'}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Style="{StaticResource Tarjeta}" Margin="0,16,0,0">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TituloTarjeta}"
+                               Text="ALGORITMO DE LA MMU · REEMPLAZO DE PÁGINA"/>
+                    <StackPanel Margin="12,0,12,14">
+                        <ItemsControl ItemsSource="{Binding AlgoritmosPaginacion}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <RadioButton Content="{Binding}" GroupName="Paginacion" Margin="0,0,16,0"
+                                                 FontSize="12.5" Checked="Algoritmo_Checked"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Style="{StaticResource Pista}" Margin="0,10,0,0" TextWrapping="Wrap"
+                                   Text="Los seis están implementados. Si algo de esto no queda claro, la sección Ayuda explica el criterio de cada uno."/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

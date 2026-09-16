@@ -1,0 +1,127 @@
+<Window x:Class="SPQR.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="clr-namespace:SPQR.UI.Vistas"
+        Title="SPQR Task Manager — Emulador de sistema operativo"
+        Height="820" Width="1280" MinHeight="640" MinWidth="1060"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Blanco}"
+        FontFamily="Segoe UI">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- barra de título -->
+        <Border Grid.Row="0" Background="{StaticResource Navy}" Padding="14,9">
+            <TextBlock Text="SPQR Task Manager — Emulador de sistema operativo"
+                       Foreground="White" FontSize="12.5" FontWeight="SemiBold"/>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="238"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- menú lateral -->
+            <Border Grid.Column="0" Background="{StaticResource Panel}"
+                    BorderBrush="{StaticResource Linea}" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="17,15,17,12">
+                        <TextBlock Text="SPQR Task Manager" FontSize="14" FontWeight="Bold"
+                                   Foreground="{StaticResource Navy}"/>
+                        <TextBlock Text="Sistemas Operativos I · Sección 74" FontSize="10.5"
+                                   Foreground="{StaticResource Ink3}" FontFamily="{StaticResource Mono}"/>
+                    </StackPanel>
+                    <Separator DockPanel.Dock="Top" Background="{StaticResource Linea2}" Margin="0,0,0,8"/>
+
+                    <StackPanel DockPanel.Dock="Bottom" Margin="17,0,17,16">
+                        <Border Background="{StaticResource Panel2}" CornerRadius="6" Padding="11,9">
+                            <StackPanel>
+                                <TextBlock Text="MÓDULO RESPONSABLE" FontSize="9" FontWeight="Bold"
+                                           Foreground="{StaticResource Ink3}"/>
+                                <TextBlock Text="{Binding ModuloActual, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           FontSize="11.5" Foreground="{StaticResource Ink2}"
+                                           TextWrapping="Wrap" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Button Content="Salir" Style="{StaticResource BotonPlano}" Margin="0,10,0,0"
+                                HorizontalAlignment="Stretch" Click="Salir_Click"/>
+                    </StackPanel>
+
+                    <ListBox x:Name="Menu" SelectedIndex="{Binding Pantalla, Mode=TwoWay}"
+                             Background="Transparent" BorderThickness="0" Padding="0"
+                             HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="17,9"/>
+                                <Setter Property="FontSize" Value="12.5"/>
+                                <Setter Property="Foreground" Value="{StaticResource Ink2}"/>
+                                <Setter Property="BorderThickness" Value="3,0,0,0"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="b" Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="b" Property="Background" Value="White"/>
+                                                    <Setter TargetName="b" Property="BorderBrush" Value="{StaticResource Navy}"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource Navy}"/>
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="b" Property="Background" Value="{StaticResource Panel2}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+
+                        <ListBoxItem Content="1   Configuración de programas"/>
+                        <ListBoxItem Content="2   Definición de lista de ejecución"/>
+                        <ListBoxItem Content="3   Configuración SO"/>
+                        <ListBoxItem Content="4   Emular MMU"/>
+                        <ListBoxItem Content="5   Informe de rendimiento"/>
+                        <ListBoxItem Content="?   Ayuda"/>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- contenido -->
+            <TabControl Grid.Column="1" SelectedIndex="{Binding Pantalla, Mode=TwoWay}"
+                        BorderThickness="0" Background="White">
+                <TabControl.ItemContainerStyle>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Style>
+                </TabControl.ItemContainerStyle>
+
+                <TabItem><v:VistaProgramas/></TabItem>
+                <TabItem><v:VistaListaEjecucion/></TabItem>
+                <TabItem><v:VistaConfiguracion/></TabItem>
+                <TabItem><v:VistaEmulacion/></TabItem>
+                <TabItem><v:VistaInforme/></TabItem>
+                <TabItem><v:VistaAyuda/></TabItem>
+            </TabControl>
+        </Grid>
+
+        <!-- barra de estado -->
+        <Border Grid.Row="2" Background="{StaticResource Panel}"
+                BorderBrush="{StaticResource Linea}" BorderThickness="0,1,0,0" Padding="16,7">
+            <TextBlock Text="{Binding Mensaje}" FontSize="11.5"
+                       Foreground="{StaticResource Ink2}" TextTrimming="CharacterEllipsis"/>
+        </Border>
+    </Grid>
+</Window>
