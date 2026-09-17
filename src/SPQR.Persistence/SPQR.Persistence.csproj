@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SPQR.Core\SPQR.Core.csproj" />
+  </ItemGroup>
+
+  <!-- El esquema vive una sola vez, en docs/. Se empaqueta dentro del
+       ensamblado para que la aplicación pueda crear una base nueva sin
+       depender de que el archivo .sql esté al lado del ejecutable.
+       Si el esquema y el código no coinciden, el que está mal es el código. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\docs\esquema-base-datos.sql"
+                      LogicalName="SPQR.Persistence.esquema-base-datos.sql" />
+  </ItemGroup>
+</Project>

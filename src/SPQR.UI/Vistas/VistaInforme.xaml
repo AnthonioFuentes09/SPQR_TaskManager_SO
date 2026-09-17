@@ -13,6 +13,7 @@
 
         <Border DockPanel.Dock="Bottom" Padding="24,10,24,16">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Borrar historial" Style="{StaticResource BotonPlano}" Command="{Binding BorrarHistorial}"/>
                 <Button Content="Exportar log (CSV)" Style="{StaticResource BotonPlano}" Click="ExportarLog_Click"/>
                 <Button Content="Comparar los seis algoritmos" Style="{StaticResource BotonPrimario}"
                         Command="{Binding Comparar}" Padding="16,6"/>
@@ -60,6 +61,34 @@
                         </DataGrid>
                     </DockPanel>
                 </Border>
+
+                <!-- Esto es lo que aporta la base de datos frente a un archivo de
+                     configuración: las corridas quedan guardadas y se pueden
+                     comparar entre sesiones distintas. -->
+                <Border Style="{StaticResource Tarjeta}" Margin="0,14,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="HISTORIAL DE CORRIDAS · GUARDADO EN LA BASE"/>
+                        <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource Pista}" Margin="12,8,12,12"
+                                   TextWrapping="Wrap"
+                                   Text="Cada vez que simulás con un escenario guardado, la corrida queda anotada en el archivo .db. Doble clic en una fila para ver su bitácora."/>
+                        <DataGrid ItemsSource="{Binding Historial}" MaxHeight="250"
+                                  MouseDoubleClick="Historial_DobleClic">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50"/>
+                                <DataGridTextColumn Header="FECHA" Binding="{Binding Fecha}" Width="130"/>
+                                <DataGridTextColumn Header="PLANIFICACIÓN" Binding="{Binding AlgoritmoPlanificacion}" Width="*"/>
+                                <DataGridTextColumn Header="MMU" Binding="{Binding AlgoritmoPaginacion}" Width="150"/>
+                                <DataGridTextColumn Header="MARCOS" Binding="{Binding MarcosFisicos}" Width="80"/>
+                                <DataGridTextColumn Header="FALLOS" Binding="{Binding FallosDePagina}" Width="80"/>
+                                <DataGridTextColumn Header="REFERENCIAS" Binding="{Binding ReferenciasTotales}" Width="105"/>
+                                <DataGridTextColumn Header="F" Binding="{Binding F}" Width="70"/>
+                                <DataGridTextColumn Header="RENDIMIENTO %" Binding="{Binding RendimientoPorcentual}" Width="120"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+
             </StackPanel>
         </ScrollViewer>
     </DockPanel>

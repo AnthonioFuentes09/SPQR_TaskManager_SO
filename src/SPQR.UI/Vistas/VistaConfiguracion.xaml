@@ -41,12 +41,12 @@
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="Quantum" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.Quantum, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.Quantum, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="Reinicio del bit R" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.IntervaloReinicioBitR, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.IntervaloReinicioBitR, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <TextBlock Style="{StaticResource Pista}" Text="Unidad de tiempo: 1 tick" Margin="0,4,0,0"/>
                         </StackPanel>
@@ -60,22 +60,22 @@
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="RAM autorizada (KB)" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.MemoriaRamKb, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.MemoriaRamKb, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="Páginas virtuales" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.PaginasVirtuales, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.PaginasVirtuales, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="Marcos físicos" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.MarcosFisicos, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.MarcosFisicos, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="Tamaño de página (KB)" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.TamanioPaginaKb, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.TamanioPaginaKb, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                         </StackPanel>
                     </StackPanel>
@@ -88,12 +88,12 @@
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="Discos duros" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.DiscosDuros, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.DiscosDuros, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <Grid Style="{StaticResource Campo}">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="Área de intercambio" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Ink2}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.AreaDeIntercambio, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.AreaDeIntercambio, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <TextBlock Style="{StaticResource Pista}" Margin="0,4,0,0"
                                        Text="{Binding Config.RelacionVirtualFisico, StringFormat='Relación V:F = {0} : 1'}"/>

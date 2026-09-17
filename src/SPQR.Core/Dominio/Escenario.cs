@@ -24,11 +24,45 @@ public sealed class Escenario
         return null;
     }
 
+    /// <summary>
+    /// Siguiente identificador libre del catálogo.
+    ///
+    /// Contar los elementos NO sirve: si el catálogo tiene P1…P5 y se quita
+    /// P3, el conteo baja a 4 y el siguiente «P5» chocaría con el P5 que
+    /// sigue existiendo. Hay que mirar el número más alto en uso, no cuántos
+    /// hay.
+    /// </summary>
+    public string SiguienteIdDePrograma()
+    {
+        var mayor = 0;
+        foreach (var p in Catalogo)
+        {
+            if (p.Id.Length < 2 || char.ToUpperInvariant(p.Id[0]) != 'P') continue;
+            if (int.TryParse(p.Id[1..], out var n) && n > mayor) mayor = n;
+        }
+        return $"P{mayor + 1}";
+    }
+
+    /// <summary>Siguiente identificador libre de la lista de ejecución. Mismo criterio.</summary>
+    public int SiguienteIdDeProceso()
+    {
+        var mayor = 0;
+        foreach (var p in ListaDeEjecucion) if (p.Id > mayor) mayor = p.Id;
+        return mayor + 1;
+    }
+
+    public int SiguienteNumeroDeCola()
+    {
+        var mayor = 0;
+        foreach (var c in Config.Colas) if (c.Numero > mayor) mayor = c.Numero;
+        return mayor + 1;
+    }
+
     public Proceso Instanciar(Programa programa, int rafaga, int llegada, int cola)
     {
         var proceso = new Proceso
         {
-            Id = ListaDeEjecucion.Cantidad + 1,
+            Id = SiguienteIdDeProceso(),
             Programa = programa,
             Rafaga = rafaga,
             TiempoLlegada = llegada,
@@ -37,6 +71,14 @@ public sealed class Escenario
         proceso.Reiniciar();
         ListaDeEjecucion.AgregarAlFinal(proceso);
         return proceso;
+    }
+
+    /// <summary>Cuántas instancias de este programa hay en la lista de ejecución.</summary>
+    public int InstanciasDe(Programa programa)
+    {
+        var n = 0;
+        foreach (var p in ListaDeEjecucion) if (ReferenceEquals(p.Programa, programa)) n++;
+        return n;
     }
 
     /// <summary>

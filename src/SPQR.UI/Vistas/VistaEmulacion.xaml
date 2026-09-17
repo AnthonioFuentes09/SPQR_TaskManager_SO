@@ -21,6 +21,21 @@
             <Setter Property="Foreground" Value="{StaticResource Navy}"/>
             <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
         </Style>
+        <Style x:Key="Leyenda" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource Mono}"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink2}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5,0,16,0"/>
+        </Style>
+        <Style x:Key="Muestra" TargetType="Border">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Linea}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </UserControl.Resources>
 
     <DockPanel>
@@ -59,7 +74,7 @@
                                    Margin="10,0" Text="{Binding PosicionTexto}"/>
 
                         <Slider Grid.Column="2" VerticalAlignment="Center" Minimum="0"
-                                Maximum="{Binding InstanteFinal}" Value="{Binding Instante, Mode=TwoWay}"
+                                Maximum="{Binding InstanteMaximo}" Value="{Binding Instante, Mode=TwoWay}"
                                 IsSnapToTickEnabled="True" TickFrequency="1" Margin="8,0"/>
 
                         <StackPanel Grid.Column="3" Orientation="Horizontal">
@@ -115,13 +130,148 @@
                                    Text="PROCESOS · VISTA DE ADMINISTRADOR DE TAREAS"/>
                         <DataGrid ItemsSource="{Binding Tareas}" MaxHeight="220">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="PROCESO" Binding="{Binding Nombre}" Width="*"/>
-                                <DataGridTextColumn Header="ESTADO" Binding="{Binding Estado}" Width="120"/>
-                                <DataGridTextColumn Header="CPU %" Binding="{Binding Cpu}" Width="80"/>
-                                <DataGridTextColumn Header="MEMORIA (KB)" Binding="{Binding MemoriaKb}" Width="120"/>
-                                <DataGridTextColumn Header="MARCOS" Binding="{Binding MarcosTexto}" Width="90"/>
+                                <!-- El punto de color es el mismo que identifica al proceso
+                                     en el mapa de marcos y en la línea de tiempo. -->
+                                <DataGridTemplateColumn Header="PROCESO" Width="110">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="9,0,0,0">
+                                                <Ellipse Width="9" Height="9" Fill="{Binding Color}"
+                                                         VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                                <TextBlock Text="{Binding Etiqueta}" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource Navy}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="NOMBRE" Binding="{Binding Nombre}" Width="*"/>
+
+                                <DataGridTemplateColumn Header="ESTADO" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Estado}" Foreground="{Binding TintaEstado}"
+                                                       FontWeight="SemiBold" Margin="9,0,0,0" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="CPU %" Binding="{Binding Cpu}" Width="75"/>
+                                <DataGridTextColumn Header="MEMORIA (KB)" Binding="{Binding MemoriaKb}" Width="110"/>
+
+                                <DataGridTemplateColumn Header="USO" Width="140">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Height="6" Width="100" CornerRadius="3" Margin="9,0,0,0"
+                                                    Background="{StaticResource Linea2}"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                <Border CornerRadius="3" Background="{Binding Color}"
+                                                        HorizontalAlignment="Left"
+                                                        Width="{Binding Uso}"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="MARCOS" Binding="{Binding MarcosTexto}" Width="85"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                    </DockPanel>
+                </Border>
+
+                <!-- línea de tiempo -->
+                <Border Style="{StaticResource Tarjeta}" Margin="0,14,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="LÍNEA DE TIEMPO DE PROCESOS"/>
+
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                            <Border Style="{StaticResource Muestra}" Background="{StaticResource OkBg}"/>
+                            <TextBlock Style="{StaticResource Leyenda}" Text="E · ejecutando"/>
+                            <Border Style="{StaticResource Muestra}" Background="{StaticResource WarnBg}"/>
+                            <TextBlock Style="{StaticResource Leyenda}" Text="B · en espera"/>
+                            <Border Style="{StaticResource Muestra}" Background="{StaticResource BadBg}"/>
+                            <TextBlock Style="{StaticResource Leyenda}" Text="F · finalizado"/>
+                            <Border Style="{StaticResource Muestra}" Background="White"
+                                    BorderBrush="{StaticResource Navy}" BorderThickness="2"/>
+                            <TextBlock Style="{StaticResource Leyenda}" Text="instante actual"/>
+                        </StackPanel>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                                      Margin="12,0,12,0">
+                            <StackPanel>
+                                <!-- cabecera de instantes -->
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="118" Height="19" Background="{StaticResource Panel}"
+                                            BorderBrush="{StaticResource Linea}" BorderThickness="0,0,1,1"/>
+                                    <ItemsControl ItemsSource="{Binding Tiempos}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="23" Height="19" Background="{StaticResource Panel}"
+                                                        BorderBrush="{StaticResource Linea2}" BorderThickness="0,0,1,1">
+                                                    <TextBlock Text="{Binding}" FontFamily="{StaticResource Mono}"
+                                                               FontSize="8.5" Foreground="{StaticResource Ink3}"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <!-- una fila por proceso -->
+                                <ItemsControl ItemsSource="{Binding LineaDeTiempo}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Border Width="118" Height="21" Background="{StaticResource Panel}"
+                                                        BorderBrush="{StaticResource Linea}" BorderThickness="0,0,1,1">
+                                                    <StackPanel Orientation="Horizontal" Margin="7,0,0,0">
+                                                        <Ellipse Width="8" Height="8" Fill="{Binding Color}"
+                                                                 VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                        <TextBlock Text="{Binding Proceso}" FontSize="10"
+                                                                   FontWeight="SemiBold" Foreground="{StaticResource Navy}"
+                                                                   VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <ItemsControl ItemsSource="{Binding Celdas}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border x:Name="celda" Width="23" Height="21"
+                                                                    Background="{Binding Fondo}"
+                                                                    BorderBrush="{StaticResource Linea2}"
+                                                                    BorderThickness="0,0,1,1">
+                                                                <TextBlock Text="{Binding Letra}"
+                                                                           Foreground="{Binding Tinta}"
+                                                                           FontFamily="{StaticResource Mono}"
+                                                                           FontSize="9.5" FontWeight="Bold"
+                                                                           HorizontalAlignment="Center"
+                                                                           VerticalAlignment="Center"/>
+                                                            </Border>
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding EsActual}" Value="True">
+                                                                    <Setter TargetName="celda" Property="BorderBrush"
+                                                                            Value="{StaticResource Navy}"/>
+                                                                    <Setter TargetName="celda" Property="BorderThickness"
+                                                                            Value="2"/>
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
                     </DockPanel>
                 </Border>
 
@@ -142,32 +292,32 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border x:Name="celda" Margin="3" Padding="7,8" CornerRadius="5"
-                                                Background="White" BorderBrush="{StaticResource Linea}" BorderThickness="1">
+                                        <!-- El color lo pone el proceso dueño: el mismo que
+                                             lleva en la lista de tareas y en la línea de
+                                             tiempo. Rojo = víctima del reemplazo. -->
+                                        <Border Margin="3" Padding="7,8" CornerRadius="5"
+                                                Background="{Binding Fondo}"
+                                                BorderBrush="{Binding Borde}" BorderThickness="1">
                                             <StackPanel HorizontalAlignment="Center">
-                                                <TextBlock Text="{Binding Etiqueta}" FontSize="9.5" FontFamily="{StaticResource Mono}"
-                                                           Foreground="{StaticResource Ink3}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Etiqueta}" FontSize="9.5"
+                                                           FontFamily="{StaticResource Mono}"
+                                                           Foreground="{StaticResource Ink3}"
+                                                           HorizontalAlignment="Center"/>
                                                 <TextBlock Text="{Binding Contenido}" FontSize="12.5" FontWeight="Bold"
-                                                           FontFamily="{StaticResource Mono}" HorizontalAlignment="Center"
-                                                           Foreground="{StaticResource Navy}"/>
-                                                <TextBlock Text="{Binding Bits}" FontSize="9" FontFamily="{StaticResource Mono}"
-                                                           Foreground="{StaticResource Ink3}" HorizontalAlignment="Center"/>
+                                                           FontFamily="{StaticResource Mono}"
+                                                           Foreground="{Binding Tinta}"
+                                                           HorizontalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Bits}" FontSize="9"
+                                                           FontFamily="{StaticResource Mono}"
+                                                           Foreground="{StaticResource Ink3}"
+                                                           HorizontalAlignment="Center"/>
                                             </StackPanel>
                                         </Border>
-                                        <DataTemplate.Triggers>
-                                            <DataTrigger Binding="{Binding Contenido}" Value="libre">
-                                                <Setter TargetName="celda" Property="Background" Value="{StaticResource Panel}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding EsVictima}" Value="True">
-                                                <Setter TargetName="celda" Property="Background" Value="{StaticResource BadBg}"/>
-                                                <Setter TargetName="celda" Property="BorderBrush" Value="{StaticResource Bad}"/>
-                                            </DataTrigger>
-                                        </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <TextBlock Style="{StaticResource Pista}" Margin="12,0,12,12" TextWrapping="Wrap"
-                                       Text="R = referenciada · M = modificada · rojo = marco donde acaba de ocurrir un desalojo"/>
+                                       Text="Color por proceso dueño · rojo = víctima del reemplazo · R = referenciada · M = modificada"/>
                         </StackPanel>
                     </Border>
 
@@ -180,12 +330,21 @@
                                       SelectedItem="{Binding ProcesoObservado, Mode=TwoWay}"/>
                             <DataGrid ItemsSource="{Binding TablaDePaginas}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="PÁGINA" Binding="{Binding Pagina}" Width="*"/>
-                                    <DataGridTextColumn Header="PRESENTE" Binding="{Binding PresenteTexto}" Width="*"/>
-                                    <DataGridTextColumn Header="MARCO" Binding="{Binding Marco}" Width="*"/>
-                                    <DataGridTextColumn Header="R" Binding="{Binding BitR}" Width="40"/>
-                                    <DataGridTextColumn Header="M" Binding="{Binding BitM}" Width="40"/>
-                                    <DataGridTextColumn Header="CLASE" Binding="{Binding Clase}" Width="60"/>
+                                    <DataGridTextColumn Header="PÁGINA" Binding="{Binding Pagina}" Width="65"/>
+                                    <DataGridTemplateColumn Header="PRESENTE" Width="85">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding PresenteTexto}" Margin="9,0,0,0"
+                                                           Foreground="{Binding TintaPresente}"
+                                                           FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="MARCO" Binding="{Binding Marco}" Width="65"/>
+                                    <DataGridTextColumn Header="BIT R" Binding="{Binding BitR}" Width="50"/>
+                                    <DataGridTextColumn Header="BIT M" Binding="{Binding BitM}" Width="50"/>
+                                    <DataGridTextColumn Header="CLASE" Binding="{Binding Clase}" Width="55"/>
+                                    <DataGridTextColumn Header="ÚLTIMO USO" Binding="{Binding UltimoUso}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>

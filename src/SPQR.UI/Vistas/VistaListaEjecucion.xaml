@@ -13,7 +13,8 @@
 
         <Border DockPanel.Dock="Bottom" Padding="24,10,24,16">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Style="{StaticResource Pista}" Text="{Binding Escenario.SumaDeRafagas, StringFormat='Suma de ráfagas: {0}'}"/>
+                <TextBlock Style="{StaticResource Pista}"
+                           Text="{Binding SumaDeRafagas, StringFormat='Suma de ráfagas: {0} · la simulación llega hasta ese instante'}"/>
                 <Button Content="Simular →" Style="{StaticResource BotonPrimario}"
                         Command="{Binding Simular}" Margin="16,0,0,0" Padding="16,6"/>
             </StackPanel>
@@ -31,16 +32,59 @@
                     <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
                                Text="LISTA DE EJECUCIÓN"/>
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,10">
-                        <Button Content="+ Instanciar programa" Style="{StaticResource BotonPlano}" Click="Instanciar_Click"/>
+                        <Button Content="+ Instanciar programa…" Style="{StaticResource BotonPlano}" Click="Instanciar_Click"/>
+                        <Button Content="Duplicar" Style="{StaticResource BotonPlano}" Click="Duplicar_Click"/>
                         <Button Content="Quitar" Style="{StaticResource BotonPlano}" Click="Quitar_Click"/>
                     </StackPanel>
                     <DataGrid x:Name="Tabla" ItemsSource="{Binding Procesos}" IsReadOnly="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="#" Binding="{Binding Id}" IsReadOnly="True" Width="40"/>
-                            <DataGridTextColumn Header="PROGRAMA" Binding="{Binding Programa.Nombre}" IsReadOnly="True" Width="*"/>
-                            <DataGridTextColumn Header="RÁFAGA" Binding="{Binding Rafaga, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
-                            <DataGridTextColumn Header="LLEGADA" Binding="{Binding TiempoLlegada, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
-                            <DataGridTextColumn Header="COLA" Binding="{Binding Cola, UpdateSourceTrigger=PropertyChanged}" Width="60"/>
+
+                            <!-- El programa se puede cambiar después de creada la fila: sin
+                                 esto, una instancia con el programa equivocado había que
+                                 borrarla y volver a crearla. -->
+                            <DataGridComboBoxColumn Header="PROGRAMA" Width="*"
+                                                    DisplayMemberPath="Nombre"
+                                                    SelectedItemBinding="{Binding Programa, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridComboBoxColumn.ElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource"
+                                                Value="{Binding DataContext.Programas, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.ElementStyle>
+                                <DataGridComboBoxColumn.EditingElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource"
+                                                Value="{Binding DataContext.Programas, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.EditingElementStyle>
+                            </DataGridComboBoxColumn>
+
+                            <DataGridTextColumn Header="RÁFAGA" Binding="{Binding Rafaga, UpdateSourceTrigger=LostFocus}" Width="80"/>
+                            <DataGridTextColumn Header="LLEGADA" Binding="{Binding TiempoLlegada, UpdateSourceTrigger=LostFocus}" Width="80"/>
+
+                            <!-- La cola se elige de las que existen. Antes era un entero
+                                 libre: escribir 7 mandaba el proceso a una regla FIFO
+                                 invisible que no aparecía en ninguna pantalla. -->
+                            <DataGridComboBoxColumn Header="COLA" Width="75"
+                                                    SelectedValueBinding="{Binding Cola, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridComboBoxColumn.ElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource"
+                                                Value="{Binding DataContext.NumerosDeCola, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.ElementStyle>
+                                <DataGridComboBoxColumn.EditingElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource"
+                                                Value="{Binding DataContext.NumerosDeCola, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.EditingElementStyle>
+                            </DataGridComboBoxColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
@@ -60,7 +104,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Quantum global" FontSize="12" Foreground="{StaticResource Ink2}"
                                            VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Text="{Binding Config.Quantum, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Config.Quantum, UpdateSourceTrigger=LostFocus}"/>
                             </Grid>
                             <TextBlock Style="{StaticResource Pista}" Margin="0,8,0,0" TextWrapping="Wrap"
                                        Text="Desempate: llegada, luego identificador."/>
@@ -72,16 +116,22 @@
                     <DockPanel>
                         <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
                                    Text="REGLAS POR COLA · SOLO PARA MÚLTIPLES COLAS"/>
-                        <DataGrid ItemsSource="{Binding Colas}" IsReadOnly="False" MaxHeight="150">
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,10">
+                            <Button Content="+ Cola" Style="{StaticResource BotonPlano}" Click="AgregarCola_Click"/>
+                            <Button Content="Quitar cola" Style="{StaticResource BotonPlano}" Click="QuitarCola_Click"/>
+                        </StackPanel>
+                        <DataGrid x:Name="TablaColas" ItemsSource="{Binding Colas}" IsReadOnly="False" MaxHeight="170">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="COLA" Binding="{Binding Numero}" IsReadOnly="True" Width="55"/>
-                                <DataGridTextColumn Header="ETIQUETA" Binding="{Binding Etiqueta}" Width="85"/>
+                                <DataGridTextColumn Header="COLA" Binding="{Binding Numero, UpdateSourceTrigger=LostFocus}" Width="55"/>
+                                <DataGridTextColumn Header="ETIQUETA" Binding="{Binding Etiqueta, UpdateSourceTrigger=LostFocus}" Width="85"/>
                                 <DataGridComboBoxColumn Header="ALGORITMO INTERNO"
                                                         SelectedValueBinding="{Binding Algoritmo}" Width="*">
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
                                             <Setter Property="ItemsSource"
                                                     Value="{Binding DataContext.AlgoritmosDeCola, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                            <Setter Property="BorderThickness" Value="0"/>
+                                            <Setter Property="Background" Value="Transparent"/>
                                         </Style>
                                     </DataGridComboBoxColumn.ElementStyle>
                                     <DataGridComboBoxColumn.EditingElementStyle>
@@ -91,7 +141,7 @@
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Header="QUANTUM" Binding="{Binding Quantum}" Width="75"/>
+                                <DataGridTextColumn Header="QUANTUM" Binding="{Binding Quantum, UpdateSourceTrigger=LostFocus}" Width="75"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>
