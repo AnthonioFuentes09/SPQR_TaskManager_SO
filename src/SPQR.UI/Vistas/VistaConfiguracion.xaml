@@ -119,7 +119,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                         <TextBlock Style="{StaticResource Pista}" Margin="0,10,0,0" TextWrapping="Wrap"
-                                   Text="Los seis están implementados. Si algo de esto no queda claro, la sección Ayuda explica el criterio de cada uno."/>
+                                   Text="Los seis están implementados."/>
                     </StackPanel>
                 </StackPanel>
             </Border>

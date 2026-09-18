@@ -447,7 +447,6 @@ public sealed class PrincipalViewModel : BaseViewModel
         // La comparación deja los procesos en el estado de la última corrida:
         // se vuelve a simular con el algoritmo elegido para dejar todo coherente.
         EjecutarSimulacion(ignorarAvisos: true);
-        Pantalla = 4;
     }
 
     private void ReconstruirMarcos()
