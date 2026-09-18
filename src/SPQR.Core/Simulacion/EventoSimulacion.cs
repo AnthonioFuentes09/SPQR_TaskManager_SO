@@ -25,6 +25,7 @@ public sealed record EventoSimulacion
     public char Letra => Estado switch
     {
         EstadoProceso.Ejecutando => 'E',
+        EstadoProceso.Listo      => 'B',
         EstadoProceso.Bloqueado  => 'B',
         EstadoProceso.Finalizado => 'F',
         _ => ' '
