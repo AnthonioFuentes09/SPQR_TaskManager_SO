@@ -28,6 +28,30 @@ public sealed record FotoMemoria
     /// <summary>Marco que sufrió el desalojo en este instante, o -1.</summary>
     public int MarcoVictima { get; init; } = -1;
 
+    // ---- la referencia que provocó esta foto (lo que va en la cuadrícula) ----
+
+    /// <summary>Proceso que tenía la CPU en este instante; vacío si la CPU estuvo ociosa.</summary>
+    public string ProcesoEnCpu { get; init; } = "";
+
+    public int ProcesoIdEnCpu { get; init; }
+
+    /// <summary>Página que pidió ese proceso, o -1 si no hubo acceso.</summary>
+    public int PaginaReferenciada { get; init; } = -1;
+
+    /// <summary>true = fallo de página, false = acierto, null = no hubo acceso.</summary>
+    public bool? Fallo { get; init; }
+
+    /// <summary>Marco donde quedó la página referenciada, o -1.</summary>
+    public int MarcoReferenciado { get; init; } = -1;
+
+    public bool HuboAcceso => PaginaReferenciada >= 0;
+
+    /// <summary>Encabezado de la columna en la cuadrícula: «A0», «B2»… o «—».</summary>
+    public string Etiqueta => HuboAcceso ? $"{ProcesoEnCpu}{PaginaReferenciada}" : "—";
+
+    /// <summary>Pie de la columna, al estilo de la tabla de clase: «x» fallo, «//» acierto.</summary>
+    public string Marca => Fallo is null ? "" : (Fallo.Value ? "x" : "//");
+
     public int EnUso
     {
         get { var n = 0; foreach (var m in Marcos) if (!m.Libre) n++; return n; }

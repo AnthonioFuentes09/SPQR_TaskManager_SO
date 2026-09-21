@@ -118,6 +118,17 @@ public sealed class PrincipalViewModel : BaseViewModel
 
     /// <summary>Los rótulos de la cabecera de la línea de tiempo: 0, 1, 2, …</summary>
     public ObservableCollection<int> Tiempos { get; } = [];
+
+    // ---------- historial de paginación (la cuadrícula de la pizarra) ----------
+
+    /// <summary>Encabezado: la referencia que se pidió en cada instante («A0», «B2», …).</summary>
+    public ObservableCollection<CeldaReferencia> Referencias { get; } = [];
+
+    /// <summary>Una fila por marco físico; cada fila, una celda por instante.</summary>
+    public ObservableCollection<FilaHistorial> HistorialPaginacion { get; } = [];
+
+    /// <summary>Pie: «x» si la referencia falló, «//» si acertó.</summary>
+    public ObservableCollection<CeldaReferencia> Marcas { get; } = [];
     public ObservableCollection<FilaProceso> Informe { get; } = [];
     public ObservableCollection<FilaComparacion> Comparacion { get; } = [];
 
@@ -198,6 +209,18 @@ public sealed class PrincipalViewModel : BaseViewModel
     public string RendimientoTexto { get => _rendimientoTexto; private set => Asignar(ref _rendimientoTexto, value); }
     public string MarcosTexto { get => _marcosTexto; private set => Asignar(ref _marcosTexto, value); }
 
+    // ---------- el resultado FINAL, que no depende del instante que se mire ----------
+    //
+    // Los indicadores de arriba son acumulados hasta el instante reproducido:
+    // sirven para ver cómo se va formando el número, pero no son «el» número.
+    // Estos tres son los de la corrida completa, que son los que se comparan
+    // contra la tabla del pizarrón.
+
+    private string _fallosFinal = "—", _rendimientoFinal = "—", _referenciasFinal = "—";
+    public string FallosFinalTexto { get => _fallosFinal; private set => Asignar(ref _fallosFinal, value); }
+    public string RendimientoFinalTexto { get => _rendimientoFinal; private set => Asignar(ref _rendimientoFinal, value); }
+    public string ReferenciasFinalTexto { get => _referenciasFinal; private set => Asignar(ref _referenciasFinal, value); }
+
     // ---------- carga y guardado ----------
 
     /// <summary>Reemplaza el escenario entero y vuelve a llenar las colecciones de la pantalla.</summary>
@@ -222,6 +245,8 @@ public sealed class PrincipalViewModel : BaseViewModel
         ReconstruirMarcos();
         Tareas.Clear(); TablaDePaginas.Clear(); Log.Clear(); Informe.Clear(); Comparacion.Clear();
         LineaDeTiempo.Clear(); Tiempos.Clear();
+        Referencias.Clear(); HistorialPaginacion.Clear(); Marcas.Clear();
+        FallosFinalTexto = "—"; RendimientoFinalTexto = "—"; ReferenciasFinalTexto = "—";
 
         ProgramaSeleccionado = Programas.FirstOrDefault();
         ProcesoObservado = Procesos.FirstOrDefault();
@@ -385,6 +410,7 @@ public sealed class PrincipalViewModel : BaseViewModel
         ArmarTareas();
         ArmarInforme();
         ArmarLineaDeTiempo();
+        ArmarHistorialDePaginacion();
 
         if (ProcesoObservado is null || !Procesos.Contains(ProcesoObservado))
             ProcesoObservado = Procesos.FirstOrDefault();
@@ -447,6 +473,11 @@ public sealed class PrincipalViewModel : BaseViewModel
         // La comparación deja los procesos en el estado de la última corrida:
         // se vuelve a simular con el algoritmo elegido para dejar todo coherente.
         EjecutarSimulacion(ignorarAvisos: true);
+
+        // ...y recién entonces se salta al informe, porque EjecutarSimulacion
+        // deja la pantalla en la de emulación. Sin esta línea la tabla de
+        // comparación se arma y no se muestra.
+        Pantalla = 4;
     }
 
     private void ReconstruirMarcos()
@@ -509,21 +540,123 @@ public sealed class PrincipalViewModel : BaseViewModel
         for (var t = 0; t < InstanteFinal; t++) Tiempos.Add(t);
     }
 
+    /// <summary>
+    /// Arma el historial de paginación: la cuadrícula que el docente dibuja en
+    /// el pizarrón. Una columna por referencia —no por proceso—, una fila por
+    /// marco físico, y abajo la fila de «x» y «//».
+    ///
+    /// Es la comprobación a mano del rendimiento: contar las «x», dividir entre
+    /// el total de columnas y restarle eso a uno. Si el número del recuadro no
+    /// coincide con ese conteo, el error está a la vista y no escondido en el
+    /// motor, que era justamente el problema que tuvimos.
+    ///
+    /// Igual que la línea de tiempo, se construye UNA sola vez al terminar de
+    /// simular: reproducir después solo mueve el recuadro de la columna actual.
+    /// </summary>
+    private void ArmarHistorialDePaginacion()
+    {
+        Referencias.Clear();
+        HistorialPaginacion.Clear();
+        Marcas.Clear();
+        _columnaHistorial = -1;
+        if (_resultado is null) return;
+
+        var filas = new List<FilaHistorial>();
+        for (var i = 0; i < Config.MarcosFisicos; i++) filas.Add(new FilaHistorial { Marco = i });
+
+        var fallos = 0;
+        var referencias = 0;
+
+        foreach (var foto in _resultado.Memoria)
+        {
+            if (foto.HuboAcceso)
+            {
+                referencias++;
+                if (foto.Fallo == true) fallos++;
+            }
+
+            Referencias.Add(new CeldaReferencia
+            {
+                Instante = foto.Instante,
+                Texto = foto.Etiqueta,
+                ProcesoId = foto.ProcesoIdEnCpu,
+                Fallo = null,                      // el encabezado se pinta por proceso
+            });
+
+            Marcas.Add(new CeldaReferencia
+            {
+                Instante = foto.Instante,
+                Texto = foto.Marca,
+                ProcesoId = foto.ProcesoIdEnCpu,
+                Fallo = foto.Fallo,
+            });
+
+            for (var i = 0; i < filas.Count; i++)
+            {
+                var m = i < foto.Marcos.Length ? foto.Marcos[i] : null;
+                filas[i].Celdas.Add(new CeldaHistorial
+                {
+                    Instante = foto.Instante,
+                    ProcesoId = m?.ProcesoId ?? 0,
+                    Pagina = m?.Pagina ?? -1,
+                    BitR = m?.BitR == true ? 1 : 0,
+                    Texto = m is null || m.Libre ? "" : $"{m.Proceso}{m.Pagina}",
+                    RecienCargada = foto.Fallo == true && foto.MarcoReferenciado == i,
+                });
+            }
+        }
+
+        // Las filas se publican recién cuando ya tienen todas sus celdas: Celdas
+        // es una lista común y no avisa de los cambios (ver ArmarLineaDeTiempo).
+        foreach (var fila in filas) HistorialPaginacion.Add(fila);
+
+        var f = referencias == 0 ? 0 : (double)fallos / referencias;
+        ReferenciasFinalTexto = referencias.ToString();
+        FallosFinalTexto = $"{fallos} de {referencias}";
+        RendimientoFinalTexto = $"{Math.Round((1 - f) * 100, 1)} %";
+    }
+
     private int _columnaActual = -1;
+    private int _columnaHistorial = -1;
 
     /// <summary>Mueve el recuadro del instante actual, sin redibujar la cuadrícula.</summary>
     private void MarcarColumna()
     {
-        if (_columnaActual == Instante) return;
-
-        foreach (var fila in LineaDeTiempo)
+        if (_columnaActual != Instante)
         {
-            if (_columnaActual >= 0 && _columnaActual < fila.Celdas.Count)
-                fila.Celdas[_columnaActual].EsActual = false;
+            foreach (var fila in LineaDeTiempo)
+            {
+                if (_columnaActual >= 0 && _columnaActual < fila.Celdas.Count)
+                    fila.Celdas[_columnaActual].EsActual = false;
+                if (Instante < fila.Celdas.Count)
+                    fila.Celdas[Instante].EsActual = true;
+            }
+            _columnaActual = Instante;
+        }
+
+        if (_columnaHistorial == Instante) return;
+
+        Apagar(Referencias, _columnaHistorial); Encender(Referencias, Instante);
+        Apagar(Marcas, _columnaHistorial);      Encender(Marcas, Instante);
+
+        foreach (var fila in HistorialPaginacion)
+        {
+            if (_columnaHistorial >= 0 && _columnaHistorial < fila.Celdas.Count)
+                fila.Celdas[_columnaHistorial].EsActual = false;
             if (Instante < fila.Celdas.Count)
                 fila.Celdas[Instante].EsActual = true;
         }
-        _columnaActual = Instante;
+        _columnaHistorial = Instante;
+
+        static void Apagar(ObservableCollection<CeldaReferencia> fila, int i)
+        {
+            if (i >= 0 && i < fila.Count) fila[i].EsActual = false;
+        }
+
+        static void Encender(ObservableCollection<CeldaReferencia> fila, int i)
+        {
+            if (i >= 0 && i < fila.Count) fila[i].EsActual = true;
+        }
     }
 
     private void ArmarInforme()

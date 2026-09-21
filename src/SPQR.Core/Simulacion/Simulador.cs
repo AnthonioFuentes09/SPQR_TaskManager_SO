@@ -160,6 +160,15 @@ public static class Simulador
             // 4 · un tick de CPU
             EventoSimulacion? eventoCpu = null;
 
+            // La foto de memoria se toma ANTES de liberar los marcos del proceso
+            // que termina: si se tomara después, la columna del instante en que
+            // un proceso finaliza saldría vacía y la cuadrícula del historial
+            // perdería justo el estado que el docente revisa.
+            FotoMarco[]? marcosDelInstante = null;
+            Proceso? duenioDelTick = null;
+            Referencia? referenciaDelTick = null;
+            ResultadoAcceso? accesoDelTick = null;
+
             if (enCpu is not null)
             {
                 enCpu.Estado = EstadoProceso.Ejecutando;
@@ -175,6 +184,10 @@ public static class Simulador
                     acceso = mmu.Acceder(enCpu, referencia, t, futuro);
                 }
 
+                duenioDelTick = enCpu;
+                referenciaDelTick = referencia;
+                accesoDelTick = acceso;
+
                 enCpu.CpuRecibida++;
                 enCpu.QuantumConsumido++;
                 enCpu.TiempoRestante--;
@@ -187,6 +200,9 @@ public static class Simulador
                     enCpu.InstanteFinalizacion = t + 1;
                     enCpu.RemanenteDeQuantum = Math.Max(0, quantum - enCpu.QuantumConsumido);
                     pendientes--;
+
+                    // foto con los marcos todavía ocupados, y recién entonces liberar
+                    if (memoria is not null && mmu is not null) marcosDelInstante = Retratar(mmu);
                     mmu?.LiberarProceso(enCpu);
                 }
 
@@ -214,31 +230,18 @@ public static class Simulador
             // 5 · foto de la memoria física de este instante
             if (memoria is not null && mmu is not null)
             {
-                var marcos = new FotoMarco[mmu.Marcos.Length];
-                for (var i = 0; i < marcos.Length; i++)
-                {
-                    var m = mmu.Marcos[i];
-                    if (m.Duenio is null)
-                    {
-                        marcos[i] = new FotoMarco { Numero = i };
-                        continue;
-                    }
-                    var entrada = m.Duenio.TablaDePaginas[m.Pagina];
-                    marcos[i] = new FotoMarco
-                    {
-                        Numero = i,
-                        ProcesoId = m.Duenio.Id,
-                        Proceso = m.Duenio.Nombre,
-                        Pagina = m.Pagina,
-                        BitR = entrada.Referenciada,
-                        BitM = entrada.Modificada,
-                    };
-                }
                 memoria.AgregarAlFinal(new FotoMemoria
                 {
                     Instante = t,
-                    Marcos = marcos,
-                    MarcoVictima = eventoCpu?.PaginaDesalojada is not null ? eventoCpu.MarcoAsignado ?? -1 : -1,
+                    Marcos = marcosDelInstante ?? Retratar(mmu),
+                    MarcoVictima = accesoDelTick?.PaginaDesalojada is not null
+                        ? accesoDelTick.Marco
+                        : -1,
+                    ProcesoEnCpu = duenioDelTick?.Programa.Nombre ?? "",
+                    ProcesoIdEnCpu = duenioDelTick?.Id ?? 0,
+                    PaginaReferenciada = referenciaDelTick?.Pagina ?? -1,
+                    Fallo = accesoDelTick?.Fallo,
+                    MarcoReferenciado = accesoDelTick?.Marco ?? -1,
                 });
             }
 
@@ -266,6 +269,34 @@ public static class Simulador
         }
 
         return t;
+    }
+
+    /// <summary>Copia el estado actual de los marcos físicos a una foto inmutable.</summary>
+    private static FotoMarco[] Retratar(Mmu mmu)
+    {
+        var marcos = new FotoMarco[mmu.Marcos.Length];
+        for (var i = 0; i < marcos.Length; i++)
+        {
+            var m = mmu.Marcos[i];
+            if (m.Duenio is null)
+            {
+                marcos[i] = new FotoMarco { Numero = i };
+                continue;
+            }
+            var entrada = m.Duenio.TablaDePaginas[m.Pagina];
+            marcos[i] = new FotoMarco
+            {
+                Numero = i,
+                ProcesoId = m.Duenio.Id,
+                // el nombre del PROGRAMA, corto: en la cuadrícula del historial
+                // cada celda tiene 34 píxeles y «A (1)0» no entra.
+                Proceso = m.Duenio.Programa.Nombre,
+                Pagina = m.Pagina,
+                BitR = entrada.Referenciada,
+                BitM = entrada.Modificada,
+            };
+        }
+        return marcos;
     }
 
     private static string? Narrar(Proceso p, Referencia r, ResultadoAcceso? acceso, bool termino)

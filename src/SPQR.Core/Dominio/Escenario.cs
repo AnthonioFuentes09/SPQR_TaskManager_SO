@@ -129,14 +129,20 @@ public sealed class Escenario
         // demanda de páginas supera a los ocho marcos y los seis algoritmos
         // de la MMU se empiezan a diferenciar, que es justamente lo que hay
         // que poder demostrar.
-        e.Instanciar(pdf,    12, 0, 1);
-        e.Instanciar(word,   16, 0, 2);
-        e.Instanciar(naveg,  14, 1, 3);
-        e.Instanciar(word,   10, 1, 1);
-        e.Instanciar(excel,  18, 2, 2);
-        e.Instanciar(reprod, 16, 2, 3);
-        e.Instanciar(pdf,    12, 3, 1);
-        e.Instanciar(word,   14, 3, 2);
+        //
+        // Y cada ráfaga es MÚLTIPLO del largo de la cadena de su programa, para
+        // que ningún proceso corte su cadena a la mitad: Word y Excel tienen 8
+        // referencias, PDF 6, Navegador 8 y Reproductor 7. Así el escenario de
+        // ejemplo abre sin un solo aviso del validador, que es como tiene que
+        // verse una demo.
+        e.Instanciar(pdf,    12, 0, 1);   // 2 vueltas de 6
+        e.Instanciar(word,   16, 0, 2);   // 2 vueltas de 8
+        e.Instanciar(naveg,  16, 1, 3);   // 2 vueltas de 8
+        e.Instanciar(word,    8, 1, 1);   // 1 vuelta  de 8
+        e.Instanciar(excel,  16, 2, 2);   // 2 vueltas de 8
+        e.Instanciar(reprod, 14, 2, 3);   // 2 vueltas de 7
+        e.Instanciar(pdf,    12, 3, 1);   // 2 vueltas de 6
+        e.Instanciar(word,   16, 3, 2);   // 2 vueltas de 8
 
         return e;
     }

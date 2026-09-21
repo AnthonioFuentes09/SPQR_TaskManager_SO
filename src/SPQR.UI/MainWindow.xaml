@@ -93,6 +93,8 @@
                         <ListBoxItem Content="2   Definición de lista de ejecución"/>
                         <ListBoxItem Content="3   Configuración SO"/>
                         <ListBoxItem Content="4   Emular MMU"/>
+                        <ListBoxItem Content="5   Informe de rendimiento"/>
+                        <ListBoxItem Content="?   Ayuda"/>
                     </ListBox>
                 </DockPanel>
             </Border>
@@ -110,6 +112,8 @@
                 <TabItem><v:VistaListaEjecucion/></TabItem>
                 <TabItem><v:VistaConfiguracion/></TabItem>
                 <TabItem><v:VistaEmulacion/></TabItem>
+                <TabItem><v:VistaInforme/></TabItem>
+                <TabItem><v:VistaAyuda/></TabItem>
             </TabControl>
         </Grid>
 

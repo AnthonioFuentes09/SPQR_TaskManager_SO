@@ -90,7 +90,7 @@
                 </Border>
 
                 <!-- indicadores -->
-                <UniformGrid Columns="5" Margin="0,14,0,0">
+                <UniformGrid Columns="6" Margin="0,14,0,0">
                     <Border Style="{StaticResource Kpi}">
                         <StackPanel>
                             <TextBlock Style="{StaticResource KpiRotulo}" Text="EN CPU"/>
@@ -105,20 +105,35 @@
                     </Border>
                     <Border Style="{StaticResource Kpi}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource KpiRotulo}" Text="FALLOS"/>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="MARCOS EN USO"/>
+                            <TextBlock Style="{StaticResource KpiValor}" Text="{Binding MarcosTexto}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Acumulados hasta el instante que se está mirando: sirven
+                         para ver cómo se forma el número mientras se reproduce. -->
+                    <Border Style="{StaticResource Kpi}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="FALLOS HASTA AQUÍ"/>
                             <TextBlock Style="{StaticResource KpiValor}" FontSize="15" Text="{Binding FallosTexto}"/>
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource Kpi}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource KpiRotulo}" Text="RENDIMIENTO = 1 − F"/>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Text="RENDIMIENTO HASTA AQUÍ"/>
                             <TextBlock Style="{StaticResource KpiValor}" Text="{Binding RendimientoTexto}"/>
                         </StackPanel>
                     </Border>
-                    <Border Style="{StaticResource Kpi}" Margin="0">
+
+                    <!-- El de la corrida completa, que no cambia al mover el
+                         deslizador: este es el que se compara con la tabla. -->
+                    <Border Style="{StaticResource Kpi}" Margin="0"
+                            BorderBrush="{StaticResource Navy}" BorderThickness="1.6">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource KpiRotulo}" Text="MARCOS EN USO"/>
-                            <TextBlock Style="{StaticResource KpiValor}" Text="{Binding MarcosTexto}"/>
+                            <TextBlock Style="{StaticResource KpiRotulo}" Foreground="{StaticResource Navy}"
+                                       Text="RENDIMIENTO FINAL = 1 − F"/>
+                            <TextBlock Style="{StaticResource KpiValor}" Text="{Binding RendimientoFinalTexto}"/>
+                            <TextBlock Style="{StaticResource Pista}" Text="{Binding FallosFinalTexto}"/>
                         </StackPanel>
                     </Border>
                 </UniformGrid>
@@ -270,6 +285,168 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+
+                <!-- ============================================================
+                     HISTORIAL DE PAGINACIÓN
+                     ============================================================
+                     La cuadrícula del pizarrón: una columna por REFERENCIA (no
+                     por proceso), una fila por marco físico, y abajo la fila de
+                     estado con «x» para el fallo y «//» para el acierto.
+
+                     Es la comprobación a mano del rendimiento: se cuentan las
+                     «x», se dividen entre el número de columnas y eso es F.
+                -->
+                <Border Style="{StaticResource Tarjeta}" Margin="0,14,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="HISTORIAL DE PAGINACIÓN · UNA COLUMNA POR REFERENCIA"/>
+
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                            <Border Style="{StaticResource Muestra}" Background="{StaticResource BadBg}"/>
+                            <TextBlock Style="{StaticResource Leyenda}" Text="x · fallo de página"/>
+                            <Border Style="{StaticResource Muestra}" Background="{StaticResource OkBg}"/>
+                            <TextBlock Style="{StaticResource Leyenda}" Text="// · acierto"/>
+                            <Border Style="{StaticResource Muestra}" Background="White"
+                                    BorderBrush="{StaticResource Bad}" BorderThickness="2"/>
+                            <TextBlock Style="{StaticResource Leyenda}" Text="página recién cargada"/>
+                            <TextBlock Style="{StaticResource Leyenda}"
+                                       Text="cada celda: proceso + página, y abajo su bit R"/>
+                        </StackPanel>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                                      Margin="12,0,12,0">
+                            <StackPanel>
+
+                                <!-- encabezado: la referencia pedida en cada instante -->
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="92" Height="26" Background="{StaticResource Panel}"
+                                            BorderBrush="{StaticResource Linea}" BorderThickness="0,0,1,1">
+                                        <TextBlock Text="Referencia" FontSize="9.5" FontWeight="Bold"
+                                                   Foreground="{StaticResource Ink3}"
+                                                   VerticalAlignment="Center" Margin="7,0,0,0"/>
+                                    </Border>
+                                    <ItemsControl ItemsSource="{Binding Referencias}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="encabezado" Width="34" Height="26"
+                                                        Background="{Binding FondoEncabezado}"
+                                                        BorderBrush="{StaticResource Linea2}" BorderThickness="0,0,1,1">
+                                                    <TextBlock Text="{Binding Texto}"
+                                                               Foreground="{Binding TintaEncabezado}"
+                                                               FontFamily="{StaticResource Mono}"
+                                                               FontSize="10" FontWeight="Bold"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding EsActual}" Value="True">
+                                                        <Setter TargetName="encabezado" Property="BorderBrush"
+                                                                Value="{StaticResource Navy}"/>
+                                                        <Setter TargetName="encabezado" Property="BorderThickness"
+                                                                Value="2"/>
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <!-- una fila por marco físico -->
+                                <ItemsControl ItemsSource="{Binding HistorialPaginacion}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Border Width="92" Height="30" Background="{StaticResource Panel}"
+                                                        BorderBrush="{StaticResource Linea}" BorderThickness="0,0,1,1">
+                                                    <TextBlock Text="{Binding Etiqueta}" FontSize="10"
+                                                               FontWeight="SemiBold" Foreground="{StaticResource Navy}"
+                                                               VerticalAlignment="Center" Margin="7,0,0,0"/>
+                                                </Border>
+
+                                                <ItemsControl ItemsSource="{Binding Celdas}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Width="34" Height="30">
+                                                                <Border Background="{Binding Fondo}"
+                                                                        BorderBrush="{Binding Borde}"
+                                                                        BorderThickness="{Binding GrosorBorde}">
+                                                                    <StackPanel VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding Texto}"
+                                                                                   Foreground="{Binding Tinta}"
+                                                                                   FontFamily="{StaticResource Mono}"
+                                                                                   FontSize="10" FontWeight="Bold"
+                                                                                   HorizontalAlignment="Center"/>
+                                                                        <TextBlock Text="{Binding BitTexto}"
+                                                                                   Foreground="{StaticResource Ink3}"
+                                                                                   FontFamily="{StaticResource Mono}"
+                                                                                   FontSize="8"
+                                                                                   HorizontalAlignment="Center"/>
+                                                                    </StackPanel>
+                                                                </Border>
+                                                                <!-- el recuadro del instante actual va encima,
+                                                                     para no pisar el borde rojo de la carga -->
+                                                                <Border x:Name="foco" BorderThickness="0"
+                                                                        BorderBrush="{StaticResource Navy}"/>
+                                                            </Grid>
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding EsActual}" Value="True">
+                                                                    <Setter TargetName="foco" Property="BorderThickness"
+                                                                            Value="2"/>
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- pie: x = fallo, // = acierto -->
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="92" Height="26" Background="{StaticResource Panel}"
+                                            BorderBrush="{StaticResource Linea}" BorderThickness="0,1,1,0">
+                                        <TextBlock Text="Estado" FontSize="9.5" FontWeight="Bold"
+                                                   Foreground="{StaticResource Ink3}"
+                                                   VerticalAlignment="Center" Margin="7,0,0,0"/>
+                                    </Border>
+                                    <ItemsControl ItemsSource="{Binding Marcas}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="marca" Width="34" Height="26"
+                                                        Background="{Binding Fondo}"
+                                                        BorderBrush="{StaticResource Linea2}" BorderThickness="0,1,1,0">
+                                                    <TextBlock Text="{Binding Texto}"
+                                                               Foreground="{Binding Tinta}"
+                                                               FontFamily="{StaticResource Mono}"
+                                                               FontSize="11" FontWeight="Bold"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding EsActual}" Value="True">
+                                                        <Setter TargetName="marca" Property="BorderBrush"
+                                                                Value="{StaticResource Navy}"/>
+                                                        <Setter TargetName="marca" Property="BorderThickness"
+                                                                Value="2"/>
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
                             </StackPanel>
                         </ScrollViewer>
                     </DockPanel>

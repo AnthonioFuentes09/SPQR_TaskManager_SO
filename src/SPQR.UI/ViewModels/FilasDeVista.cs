@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Media;
 using SPQR.Core.Dominio;
 
@@ -221,6 +222,88 @@ public sealed class FilaProceso
         Espera = p.TiempoEspera?.ToString() ?? "—",
         Respuesta = p.TiempoRespuesta?.ToString() ?? "—",
     };
+}
+
+// ---------------------------------------------------------------------------
+//  Historial de paginación (la cuadrícula estilo pizarra de la clase)
+// ---------------------------------------------------------------------------
+//
+//  Una columna por referencia, de izquierda a derecha, y una fila por marco
+//  físico. Cada celda dice qué página vivía en ese marco en ese instante y con
+//  qué bit R. Abajo, la fila de estado: «x» si la referencia provocó un fallo,
+//  «//» si fue un acierto.
+//
+//  Es exactamente la tabla que el docente dibuja en el pizarrón, y es la única
+//  forma de comprobar a mano que el conteo de fallos es el correcto: se cuentan
+//  las «x» y se dividen entre el total de columnas.
+
+/// <summary>Una celda del encabezado («A0») o del pie («x» / «//») de la cuadrícula.</summary>
+public sealed class CeldaReferencia : BaseViewModel
+{
+    private bool _esActual;
+
+    public required int Instante { get; init; }
+    public required string Texto { get; init; }
+    public required int ProcesoId { get; init; }
+
+    /// <summary>true = fallo, false = acierto, null = la CPU estuvo ociosa.</summary>
+    public bool? Fallo { get; init; }
+
+    public Brush Fondo => Fallo is null ? Paleta.Vacio
+                        : Fallo.Value ? Paleta.BadBg
+                        : Paleta.OkBg;
+
+    public Brush Tinta => Fallo is null ? Paleta.Ink3
+                        : Fallo.Value ? Paleta.Bad
+                        : Paleta.Ok;
+
+    public Brush TintaEncabezado => ProcesoId == 0 ? Paleta.Ink3 : Paleta.TintaDe(ProcesoId);
+    public Brush FondoEncabezado => ProcesoId == 0 ? Paleta.Vacio : Paleta.FondoDe(ProcesoId);
+
+    /// <summary>Marca la columna del instante que se está reproduciendo.</summary>
+    public bool EsActual { get => _esActual; set => Asignar(ref _esActual, value); }
+}
+
+/// <summary>El contenido de un marco en una columna de la cuadrícula.</summary>
+public sealed class CeldaHistorial : BaseViewModel
+{
+    private bool _esActual;
+
+    public required int Instante { get; init; }
+    public required int ProcesoId { get; init; }
+
+    /// <summary>Página cargada en el marco, o -1 si estaba libre.</summary>
+    public required int Pagina { get; init; }
+
+    public required int BitR { get; init; }
+
+    /// <summary>true si esta es la página que acaba de cargarse en este instante.</summary>
+    public required bool RecienCargada { get; init; }
+
+    public bool Libre => ProcesoId == 0;
+
+    /// <summary>«A2» — el proceso y su página, como en la pizarra.</summary>
+    public string Texto { get; init; } = "";
+
+    public string BitTexto => Libre ? "" : BitR.ToString();
+
+    public Brush Fondo => Libre ? Paleta.Libre : Paleta.FondoDe(ProcesoId);
+    public Brush Borde => RecienCargada ? Paleta.Bad
+                        : Libre ? Paleta.LibreBorde
+                        : Paleta.BordeDe(ProcesoId);
+    public Brush Tinta => Libre ? Paleta.LibreTinta : Paleta.TintaDe(ProcesoId);
+
+    public Thickness GrosorBorde => new(RecienCargada ? 1.6 : 0.6);
+
+    public bool EsActual { get => _esActual; set => Asignar(ref _esActual, value); }
+}
+
+/// <summary>Una fila de la cuadrícula: la vida entera de un marco físico.</summary>
+public sealed class FilaHistorial
+{
+    public required int Marco { get; init; }
+    public string Etiqueta => $"Marco {Marco}";
+    public List<CeldaHistorial> Celdas { get; } = [];
 }
 
 /// <summary>Una línea del log de eventos.</summary>

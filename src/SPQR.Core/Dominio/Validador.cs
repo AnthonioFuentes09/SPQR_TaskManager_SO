@@ -73,6 +73,41 @@ public static class Validador
                 problemas.Add(new Problema(Severidad.Error, donde,
                     $"Está en la cola {proceso.Cola}, que no existe. " +
                     "Definila en «Reglas por cola» o movelo a una cola existente."));
+
+            // La ráfaga manda: cada tick de CPU dispara exactamente un acceso a
+            // memoria. Que la cadena se repita NO es un problema —un programa
+            // que da dos vueltas a su bucle referencia dos veces las mismas
+            // páginas, que es lo normal—; el problema es cortarla a la mitad,
+            // porque entonces hay páginas que el programa declara y nunca toca,
+            // y el rendimiento se mide sobre una cadena que no es la suya.
+            //
+            // Por eso la condición es el RESTO, no la igualdad: la ráfaga tiene
+            // que cerrar un número entero de vueltas.
+            var largo = proceso.Programa.CadenaDeReferencias.Cantidad;
+            if (largo > 0 && proceso.Rafaga % largo != 0)
+            {
+                var vueltas = proceso.Rafaga / largo;
+                var sueltas = proceso.Rafaga % largo;
+
+                var detalle = vueltas == 0
+                    ? $"solo se van a ver las primeras {sueltas} de {largo} referencias, y " +
+                      (largo - sueltas == 1
+                          ? "la restante no se toca nunca"
+                          : $"las {largo - sueltas} restantes no se tocan nunca")
+                    : $"se dan {vueltas} vuelta{(vueltas == 1 ? "" : "s")} completa" +
+                      $"{(vueltas == 1 ? "" : "s")} y {sueltas} referencia" +
+                      $"{(sueltas == 1 ? "" : "s")} más, cortando la cadena por la mitad";
+
+                var sugerido = (vueltas + 1) * largo;
+                var comoAjustar = sugerido == largo
+                    ? $"Poné la ráfaga en {largo}, o en un múltiplo de {largo}"
+                    : $"Poné la ráfaga en {sugerido} —el múltiplo de {largo} más cercano hacia arriba—";
+
+                problemas.Add(new Problema(Severidad.Aviso, donde,
+                    $"La ráfaga es {proceso.Rafaga} y la cadena del programa tiene {largo} " +
+                    $"referencias: {detalle}. {comoAjustar} y el rendimiento se va a medir " +
+                    "sobre la cadena completa."));
+            }
         }
 
         // ---------- configuración ----------

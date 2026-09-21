@@ -60,7 +60,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         0 or 1 => "Módulo 1 · Procesos y planificación",
         2      => "Módulo 2 · Memoria y paginación",
-        _      => "Módulo 3 · Emulación y visualización",
+        3 or 4 => "Módulo 3 · Emulación y visualización",
+        _      => "Transversal · los tres módulos",
     };
 
     public event PropertyChangedEventHandler? PropertyChanged;

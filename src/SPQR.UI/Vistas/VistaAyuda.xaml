@@ -1,0 +1,299 @@
+<UserControl x:Class="SPQR.UI.Vistas.VistaAyuda"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="Articulo" TargetType="Border">
+            <Setter Property="BorderBrush" Value="{StaticResource Linea}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="7"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="16,14"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+        <Style x:Key="H" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource Navy}"/>
+        </Style>
+        <Style x:Key="Sup" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="9.5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource Mono}"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink3}"/>
+            <Setter Property="Margin" Value="0,2,0,8"/>
+        </Style>
+        <Style x:Key="P" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink2}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="LineHeight" Value="19"/>
+            <Setter Property="Margin" Value="0,0,0,7"/>
+        </Style>
+        <Style x:Key="Aviso" TargetType="Border">
+            <Setter Property="Background" Value="#E4EDF9"/>
+            <Setter Property="BorderBrush" Value="#B6CCEA"/>
+            <Setter Property="BorderThickness" Value="3,1,1,1"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+        <Style x:Key="TextoAviso" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource Navy2}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="LineHeight" Value="18"/>
+        </Style>
+        <Style x:Key="Formula" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource Panel}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Linea}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Margin" Value="0,4,0,9"/>
+        </Style>
+        <Style x:Key="Def" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource Navy}"/>
+            <Setter Property="Margin" Value="0,0,12,5"/>
+        </Style>
+        <Style x:Key="Val" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink2}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{StaticResource Linea2}" BorderThickness="0,0,0,1"
+                Padding="24,16,24,12">
+            <StackPanel>
+                <TextBlock Text="Ayuda" Style="{StaticResource Titulo}"/>
+                <TextBlock Style="{StaticResource Subtitulo}"
+                           Text="Todo el contexto conceptual del emulador vive acá. Las pantallas de trabajo quedan limpias; lo que hay que entender se consulta en esta sección."/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16,24,20">
+            <StackPanel MaxWidth="900" HorizontalAlignment="Left">
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Qué hace el emulador"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="VISIÓN GENERAL"/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="SPQR Task Manager simula el trabajo de un sistema operativo sobre una máquina imaginaria: reparte el procesador entre varios procesos y administra una memoria que siempre es más chica de lo que los procesos piden. La simulación corre completa de un solo tirón y deja una lista ordenada de eventos; la pantalla de emulación no recalcula nada, solo reproduce esa lista paso a paso. Por eso se puede adelantar, retroceder y pausar, y por eso el informe final es un simple conteo."/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="90"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Style="{StaticResource Def}" Text="Módulo 1"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="Procesos y planificación — pantallas 1 y 2, los siete algoritmos de reparto de CPU."/>
+                            <TextBlock Grid.Row="1" Style="{StaticResource Def}" Text="Módulo 2"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="Memoria y paginación — pantalla 3, la MMU, la tabla de páginas y los seis algoritmos de reemplazo."/>
+                            <TextBlock Grid.Row="2" Style="{StaticResource Def}" Text="Módulo 3"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="Emulación y visualización — pantallas 4 y 5, el reproductor de eventos y el informe de rendimiento."/>
+                        </Grid>
+                        <Border Style="{StaticResource Aviso}">
+                            <TextBlock Style="{StaticResource TextoAviso}"
+                                       Text="Cada integrante del equipo puede explicar su módulo de punta a punta sin depender de los otros dos, porque los módulos se comunican solo por el contrato de eventos."/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Registro de un programa"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="PANTALLA 1 · CONFIGURACIÓN DE PROGRAMAS"/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="Un programa es la plantilla; el proceso es la instancia que corre. Un mismo programa se puede lanzar varias veces, y cada ejecución es un proceso distinto con su propio estado."/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Style="{StaticResource Def}" Text="Páginas"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="Cuántas páginas virtuales ocupa el programa en memoria."/>
+                            <TextBlock Grid.Row="1" Style="{StaticResource Def}" Text="Cadena de referencias"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="El orden en que el programa toca sus páginas mientras se ejecuta. Es la entrada de todos los algoritmos de la MMU. Una «w» después del número marca una escritura, que es lo que enciende el bit M."/>
+                            <TextBlock Grid.Row="2" Style="{StaticResource Def}" Text="Prioridad"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="Número menor = más urgente. La usan Prioridad y Múltiples colas."/>
+                            <TextBlock Grid.Row="3" Style="{StaticResource Def}" Text="Boletos"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="Los usa Planificación por sorteo: se rifa el procesador y quien tiene más boletos gana más seguido."/>
+                            <TextBlock Grid.Row="4" Style="{StaticResource Def}" Text="% asignación"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Val}"
+                                       Text="Lo usa Planificación garantizada: la porción de CPU que le fue prometida al proceso. El planificador compara lo prometido con lo realmente recibido y corrige."/>
+                        </Grid>
+                        <Border Style="{StaticResource Aviso}">
+                            <TextBlock Style="{StaticResource TextoAviso}"
+                                       Text="Boletos y porcentaje parecen sobrar, pero son los dos campos sin los cuales sorteo y garantizada no se pueden programar. Por eso el catálogo los pide desde el inicio, aunque el algoritmo elegido no los use."/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Lista de ejecución"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="PANTALLA 2 · DEFINICIÓN DE LISTA DE EJECUCIÓN"/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="Es la secuencia concreta que se va a simular. No es uno a uno con el catálogo: Word puede aparecer tres veces, cada aparición con su propia ráfaga y su propio tiempo de llegada, y las tres compiten entre sí como procesos independientes. La lista se guarda en una lista enlazada con apuntadores, no en una colección del lenguaje, porque la rúbrica pide manejo explícito de nodos."/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="La suma de las ráfagas define hasta qué instante llega la línea de tiempo."/>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Algoritmos de planificación"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="MÓDULO 1 · SIETE ALGORITMOS"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Style="{StaticResource Def}" Text="FIFO"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}" Text="Se atiende en orden de llegada, sin interrupciones."/>
+                            <TextBlock Grid.Row="1" Style="{StaticResource Def}" Text="SJF / SRTF"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}" Text="Entra el de ráfaga más corta. SRTF es la versión apropiativa: compara el tiempo restante en cada instante, así que la llegada de uno más corto despoja al que corre."/>
+                            <TextBlock Grid.Row="2" Style="{StaticResource Def}" Text="Round Robin"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}" Text="Cada proceso recibe un quantum y vuelve al final de la cola."/>
+                            <TextBlock Grid.Row="3" Style="{StaticResource Def}" Text="Prioridad"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Val}" Text="Entra el de prioridad más alta. Riesgo conocido: inanición de los procesos de prioridad baja."/>
+                            <TextBlock Grid.Row="4" Style="{StaticResource Def}" Text="Garantizada"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Val}" Text="Reparte según el porcentaje prometido: gana el turno quien va más atrasado respecto de su promesa."/>
+                            <TextBlock Grid.Row="5" Style="{StaticResource Def}" Text="Sorteo"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource Val}" Text="Rifa el procesador entre los boletos de los procesos listos."/>
+                            <TextBlock Grid.Row="6" Style="{StaticResource Def}" Text="Múltiples colas"/>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Style="{StaticResource Val}" Text="Varias colas de distinta prioridad, cada una con su propio algoritmo interno."/>
+                        </Grid>
+                        <Border Style="{StaticResource Aviso}">
+                            <TextBlock Style="{StaticResource TextoAviso}"
+                                       Text="Múltiples colas es el único algoritmo compuesto: usa otros por dentro. Toma dos decisiones en cada instante. Primero elige la cola de mayor prioridad que no esté vacía; recién dentro de esa cola aplica la regla que esa cola tenga configurada — Round Robin, SJF o FIFO. Por eso la pantalla 2 muestra una tabla de reglas por cola: sin ella el algoritmo queda a medias."/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Páginas contra marcos"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="PANTALLA 3 · CONFIGURACIÓN SO"/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="La configuración define muchas más páginas virtuales que marcos físicos. Esa diferencia no es un error: es el motor de todo el módulo de memoria. Si hubiera un marco por cada página nunca habría que desalojar nada y los seis algoritmos de reemplazo darían exactamente el mismo resultado, con lo cual no habría nada que comparar ni nada que demostrar."/>
+                        <Border Style="{StaticResource Formula}">
+                            <TextBlock FontFamily="{StaticResource Mono}" FontSize="13.5" FontWeight="Bold"
+                                       Foreground="{StaticResource Navy}"
+                                       Text="páginas virtuales ÷ marcos físicos = relación V : F"/>
+                        </Border>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="Cuando un proceso pide una página que no está cargada ocurre un fallo de página: la MMU busca un marco libre; si no hay, elige una víctima con el algoritmo configurado, la escribe al área de intercambio si venía modificada, libera el marco y carga la página pedida."/>
+                        <Border Style="{StaticResource Aviso}" Background="#FBF0C4" BorderBrush="#ECD98A">
+                            <TextBlock Style="{StaticResource TextoAviso}" Foreground="{StaticResource Warn}"
+                                       Text="Mantener la presión de memoria alta es intencional. Es lo que hace visible la diferencia entre un algoritmo bueno y uno malo. Si en el informe los seis empatan, es señal de que sobran marcos para la carga configurada."/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Los seis de la MMU"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="MÓDULO 2 · ALGORITMOS DE REEMPLAZO"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Style="{StaticResource Def}" Text="Óptimo"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la página que tardará más en volver a usarse. Solo es posible porque la cadena de referencias completa se conoce de antemano. Sirve como cota superior."/>
+                            <TextBlock Grid.Row="1" Style="{StaticResource Def}" Text="FIFO"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la que lleva más tiempo cargada, sin mirar si se usa. Es el único que sufre la anomalía de Belady."/>
+                            <TextBlock Grid.Row="2" Style="{StaticResource Def}" Text="Segunda oportunidad"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}" Text="FIFO que, antes de desalojar, revisa el bit R del primero de la fila: si está encendido lo apaga y lo manda al final de la fila."/>
+                            <TextBlock Grid.Row="3" Style="{StaticResource Def}" Text="Reloj"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Val}" Text="La misma idea, pero sobre una lista circular con una manecilla que avanza. No mueve elementos de lugar."/>
+                            <TextBlock Grid.Row="4" Style="{StaticResource Def}" Text="NRU"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Val}" Text="Clasifica las páginas en cuatro clases según los bits R y M y desaloja una de la clase más baja que exista."/>
+                            <TextBlock Grid.Row="5" Style="{StaticResource Def}" Text="LRU"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la que lleva más tiempo sin ser usada. Es el que más se acerca al óptimo."/>
+                        </Grid>
+                        <Border Style="{StaticResource Aviso}">
+                            <TextBlock Style="{StaticResource TextoAviso}"
+                                       Text="Los seis se programan, uno se elige. El docente aclaró que no se sabrá cuál hay que usar hasta el momento de la demostración, así que los seis tienen que estar terminados y funcionando. Y advirtió expresamente que segunda oportunidad y reloj son algoritmos distintos: llegan al mismo criterio por caminos diferentes y no se pueden contar como uno solo."/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Bits R y M · clases de NRU"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="PANTALLA 4 · TABLA DE PAGINACIÓN"/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="Cada entrada de la tabla de páginas guarda dos banderas. R se enciende cuando la página se lee o se escribe; M se enciende solo cuando se escribe. La columna Clase combina las dos en cuatro categorías, que es exactamente lo que mira NRU:"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Style="{StaticResource Def}" Text="Clase 0 · R0 M0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}" Text="Ni referenciada ni modificada. La mejor candidata a desalojo."/>
+                            <TextBlock Grid.Row="1" Style="{StaticResource Def}" Text="Clase 1 · R0 M1"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}" Text="Modificada pero no referenciada hace rato. Hay que escribirla al disco."/>
+                            <TextBlock Grid.Row="2" Style="{StaticResource Def}" Text="Clase 2 · R1 M0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}" Text="Referenciada hace poco, limpia. Se desaloja sin escribir."/>
+                            <TextBlock Grid.Row="3" Style="{StaticResource Def}" Text="Clase 3 · R1 M1"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Val}" Text="Referenciada y sucia. La peor candidata."/>
+                        </Grid>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="El bit M decide el costo del desalojo: si está encendido, la página se escribe al área de intercambio antes de liberar el marco; si está apagado, el marco se libera de inmediato porque la copia del disco sigue siendo válida. El informe cuenta esas escrituras por separado."/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="El sistema apaga los bits R cada cierto número de ticks (se configura en la pantalla 3). Sin esa limpieza, a los pocos instantes todas las páginas quedarían con R = 1 y la clasificación dejaría de distinguir nada."/>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Cómo se mide el rendimiento"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="PANTALLA 5 · INFORME"/>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="La métrica del curso no es la tasa de fallos sino su complemento. Primero se calcula F, la proporción de referencias que terminaron en fallo, y el rendimiento es lo que queda:"/>
+                        <Border Style="{StaticResource Formula}">
+                            <TextBlock FontFamily="{StaticResource Mono}" FontSize="13.5" FontWeight="Bold"
+                                       Foreground="{StaticResource Navy}"
+                                       Text="F = fallos ÷ referencias     ·     Rendimiento = 1 − F"/>
+                        </Border>
+                        <TextBlock Style="{StaticResource P}"
+                                   Text="Con 15 fallos sobre 33 referencias, F = 0.45 y el rendimiento es 55 %. Un algoritmo es mejor que otro cuando su rendimiento es más alto, y ninguno puede superar al Óptimo."/>
+                        <Border Style="{StaticResource Aviso}">
+                            <TextBlock Style="{StaticResource TextoAviso}"
+                                       Text="El modo de comparación vuelve a correr la misma configuración con los seis algoritmos y arma la tabla final. Como la simulación ya dejó la lista de eventos, comparar es contar."/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Articulo}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H}" Text="Glosario"/>
+                        <TextBlock Style="{StaticResource Sup}" Text="TÉRMINOS QUE APARECEN EN LAS PANTALLAS"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Style="{StaticResource Def}" Text="Ráfaga"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}" Text="Tiempo de procesador que el proceso necesita para terminar."/>
+                            <TextBlock Grid.Row="1" Style="{StaticResource Def}" Text="Quantum"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}" Text="Tajada de tiempo que Round Robin le presta a cada proceso."/>
+                            <TextBlock Grid.Row="2" Style="{StaticResource Def}" Text="Retorno"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}" Text="Desde que el proceso llega hasta que termina."/>
+                            <TextBlock Grid.Row="3" Style="{StaticResource Def}" Text="Espera"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Val}" Text="Retorno menos la ráfaga: el tiempo que pasó sin avanzar."/>
+                            <TextBlock Grid.Row="4" Style="{StaticResource Def}" Text="Respuesta"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Val}" Text="Desde que llega hasta que entra al procesador por primera vez."/>
+                            <TextBlock Grid.Row="5" Style="{StaticResource Def}" Text="Área de intercambio"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource Val}" Text="Zona del disco donde se guardan las páginas desalojadas que venían modificadas."/>
+                            <TextBlock Grid.Row="6" Style="{StaticResource Def}" Text="Anomalía de Belady"/>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Style="{StaticResource Val}" Text="Agregar marcos y obtener más fallos. Solo le pasa a FIFO."/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

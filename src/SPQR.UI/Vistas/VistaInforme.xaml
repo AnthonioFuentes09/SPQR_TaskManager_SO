@@ -1,0 +1,95 @@
+<UserControl x:Class="SPQR.UI.Vistas.VistaInforme"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{StaticResource Linea2}" BorderThickness="0,0,0,1"
+                Padding="24,16,24,12">
+            <StackPanel>
+                <TextBlock Text="Informe de rendimiento" Style="{StaticResource Titulo}"/>
+                <TextBlock Style="{StaticResource Subtitulo}"
+                           Text="Se arma al terminar la emulación. El modo de comparación corre la misma configuración con los seis algoritmos de paginación."/>
+            </StackPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom" Padding="24,10,24,16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Borrar historial" Style="{StaticResource BotonPlano}" Command="{Binding BorrarHistorial}"/>
+                <Button Content="Exportar log (CSV)" Style="{StaticResource BotonPlano}" Click="ExportarLog_Click"/>
+                <Button Content="Comparar los seis algoritmos" Style="{StaticResource BotonPrimario}"
+                        Command="{Binding Comparar}" Padding="16,6"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16,24,0">
+            <StackPanel>
+                <Border Style="{StaticResource Tarjeta}">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="PLANIFICADOR · TIEMPOS POR PROCESO"/>
+                        <DataGrid ItemsSource="{Binding Informe}" MaxHeight="270">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="PROCESO" Binding="{Binding Proceso}" Width="*"/>
+                                <DataGridTextColumn Header="RÁFAGA" Binding="{Binding Rafaga}" Width="85"/>
+                                <DataGridTextColumn Header="LLEGADA" Binding="{Binding Llegada}" Width="85"/>
+                                <DataGridTextColumn Header="FIN" Binding="{Binding Fin}" Width="70"/>
+                                <DataGridTextColumn Header="RETORNO" Binding="{Binding Retorno}" Width="90"/>
+                                <DataGridTextColumn Header="ESPERA" Binding="{Binding Espera}" Width="85"/>
+                                <DataGridTextColumn Header="RESPUESTA" Binding="{Binding Respuesta}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+
+                <Border Style="{StaticResource Tarjeta}" Margin="0,14,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="COMPARACIÓN ENTRE LOS SEIS ALGORITMOS DE PAGINACIÓN"/>
+                        <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource Pista}" Margin="12,8,12,12"
+                                   TextWrapping="Wrap"
+                                   Text="F = fallos ÷ referencias.  Rendimiento = 1 − F.  El Óptimo es la cota superior: ningún algoritmo implementable puede superarlo."/>
+                        <DataGrid ItemsSource="{Binding Comparacion}" MaxHeight="290">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ALGORITMO" Binding="{Binding Algoritmo}" Width="160"/>
+                                <DataGridTextColumn Header="REFERENCIAS" Binding="{Binding Referencias}" Width="105"/>
+                                <DataGridTextColumn Header="FALLOS" Binding="{Binding Fallos}" Width="80"/>
+                                <DataGridTextColumn Header="F" Binding="{Binding F}" Width="70"/>
+                                <DataGridTextColumn Header="RENDIMIENTO %" Binding="{Binding RendimientoPorcentual}" Width="120"/>
+                                <DataGridTextColumn Header="DESALOJOS" Binding="{Binding Desalojos}" Width="95"/>
+                                <DataGridTextColumn Header="ESCRITURAS" Binding="{Binding EscriturasADisco}" Width="100"/>
+                                <DataGridTextColumn Header="CRITERIO" Binding="{Binding Criterio}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+
+                <!-- Esto es lo que aporta la base de datos frente a un archivo de
+                     configuración: las corridas quedan guardadas y se pueden
+                     comparar entre sesiones distintas. -->
+                <Border Style="{StaticResource Tarjeta}" Margin="0,14,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Style="{StaticResource TituloTarjeta}"
+                                   Text="HISTORIAL DE CORRIDAS · GUARDADO EN LA BASE"/>
+                        <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource Pista}" Margin="12,8,12,12"
+                                   TextWrapping="Wrap"
+                                   Text="Cada vez que simulás con un escenario guardado, la corrida queda anotada en el archivo .db. Doble clic en una fila para ver su bitácora."/>
+                        <DataGrid ItemsSource="{Binding Historial}" MaxHeight="250"
+                                  MouseDoubleClick="Historial_DobleClic">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" Binding="{Binding Id}" Width="50"/>
+                                <DataGridTextColumn Header="FECHA" Binding="{Binding Fecha}" Width="130"/>
+                                <DataGridTextColumn Header="PLANIFICACIÓN" Binding="{Binding AlgoritmoPlanificacion}" Width="*"/>
+                                <DataGridTextColumn Header="MMU" Binding="{Binding AlgoritmoPaginacion}" Width="150"/>
+                                <DataGridTextColumn Header="MARCOS" Binding="{Binding MarcosFisicos}" Width="80"/>
+                                <DataGridTextColumn Header="FALLOS" Binding="{Binding FallosDePagina}" Width="80"/>
+                                <DataGridTextColumn Header="REFERENCIAS" Binding="{Binding ReferenciasTotales}" Width="105"/>
+                                <DataGridTextColumn Header="F" Binding="{Binding F}" Width="70"/>
+                                <DataGridTextColumn Header="RENDIMIENTO %" Binding="{Binding RendimientoPorcentual}" Width="120"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>
