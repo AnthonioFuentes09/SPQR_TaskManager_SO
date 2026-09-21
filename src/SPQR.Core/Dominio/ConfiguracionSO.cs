@@ -12,7 +12,7 @@ public sealed class ConfiguracionSO : ObjetoObservable
     private int _tamanioPaginaKb = 4;
     private int _discosDuros = 1;
     private int _areaDeIntercambio = 40;
-    private int _intervaloReinicioBitR = 5;
+    private int _intervaloReinicioBitR = 0;   // apagado: el docente no lo usa (ver la propiedad)
     private int _semillaSorteo = 2026;
     private string _algoritmoPlanificacion = "RoundRobin";
     private string _algoritmoPaginacion = "Lru";
@@ -61,9 +61,14 @@ public sealed class ConfiguracionSO : ObjetoObservable
 
     /// <summary>
     /// Cada cuántos ticks el sistema apaga los bits R de todas las páginas.
-    /// NRU y los algoritmos que miran el bit R dependen de esta limpieza:
-    /// sin ella, a los pocos instantes todas las páginas quedarían con R = 1
-    /// y la clasificación dejaría de distinguir nada. 0 la desactiva.
+    /// 0 la desactiva, y es el valor por defecto.
+    ///
+    /// Viene APAGADA a propósito. En los ejercicios de clase el docente nunca
+    /// limpia los bits por reloj: en segunda oportunidad y en reloj los bits
+    /// los apaga el propio algoritmo al recorrer, y en NRU se limpian en cada
+    /// fallo. Antes el valor por defecto era 5, y eso bastaba para que esos
+    /// tres algoritmos dieran distinto que la pizarra en cualquier cadena de
+    /// más de cinco referencias.
     /// </summary>
     public int IntervaloReinicioBitR
     {

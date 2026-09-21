@@ -75,38 +75,25 @@ public static class Validador
                     "Definila en «Reglas por cola» o movelo a una cola existente."));
 
             // La ráfaga manda: cada tick de CPU dispara exactamente un acceso a
-            // memoria. Que la cadena se repita NO es un problema —un programa
-            // que da dos vueltas a su bucle referencia dos veces las mismas
-            // páginas, que es lo normal—; el problema es cortarla a la mitad,
-            // porque entonces hay páginas que el programa declara y nunca toca,
-            // y el rendimiento se mide sobre una cadena que no es la suya.
+            // memoria, así que el total de referencias es la suma de ráfagas.
+            // Es el modelo del docente —en su prueba de 8 programas con ráfaga
+            // 4 y 3 páginas, cada proceso pide 1, 2, 3 y otra vez 1—, así que
+            // que la cadena se RECICLE no es ningún error.
             //
-            // Por eso la condición es el RESTO, no la igualdad: la ráfaga tiene
-            // que cerrar un número entero de vueltas.
+            // Lo que sí es casi siempre un error es lo contrario: escribir la
+            // cadena de un ejercicio y dejar la ráfaga más corta. Entonces las
+            // últimas referencias nunca se simulan y el resultado no es el del
+            // ejercicio. Ese es el único caso que se avisa.
             var largo = proceso.Programa.CadenaDeReferencias.Cantidad;
-            if (largo > 0 && proceso.Rafaga % largo != 0)
+            if (largo > 0 && proceso.Rafaga < largo)
             {
-                var vueltas = proceso.Rafaga / largo;
-                var sueltas = proceso.Rafaga % largo;
-
-                var detalle = vueltas == 0
-                    ? $"solo se van a ver las primeras {sueltas} de {largo} referencias, y " +
-                      (largo - sueltas == 1
-                          ? "la restante no se toca nunca"
-                          : $"las {largo - sueltas} restantes no se tocan nunca")
-                    : $"se dan {vueltas} vuelta{(vueltas == 1 ? "" : "s")} completa" +
-                      $"{(vueltas == 1 ? "" : "s")} y {sueltas} referencia" +
-                      $"{(sueltas == 1 ? "" : "s")} más, cortando la cadena por la mitad";
-
-                var sugerido = (vueltas + 1) * largo;
-                var comoAjustar = sugerido == largo
-                    ? $"Poné la ráfaga en {largo}, o en un múltiplo de {largo}"
-                    : $"Poné la ráfaga en {sugerido} —el múltiplo de {largo} más cercano hacia arriba—";
-
+                var faltan = largo - proceso.Rafaga;
                 problemas.Add(new Problema(Severidad.Aviso, donde,
-                    $"La ráfaga es {proceso.Rafaga} y la cadena del programa tiene {largo} " +
-                    $"referencias: {detalle}. {comoAjustar} y el rendimiento se va a medir " +
-                    "sobre la cadena completa."));
+                    $"La cadena tiene {largo} referencias pero la ráfaga es {proceso.Rafaga}: " +
+                    (faltan == 1
+                        ? "la última referencia no se va a simular. "
+                        : $"las últimas {faltan} referencias no se van a simular. ") +
+                    $"Si es la cadena de un ejercicio, poné la ráfaga en {largo}."));
             }
         }
 
@@ -120,10 +107,11 @@ public static class Validador
                 "Sobra memoria: no va a haber ni un reemplazo y los seis algoritmos " +
                 "de la MMU van a dar exactamente el mismo resultado."));
 
-        if (e.Config.IntervaloReinicioBitR == 0)
+        if (e.Config.IntervaloReinicioBitR > 0)
             problemas.Add(new Problema(Severidad.Aviso, "Configuración SO",
-                "El reinicio del bit R está apagado. NRU, reloj y segunda oportunidad " +
-                "van a degenerar: con todos los bits R encendidos dejan de distinguir páginas."));
+                $"El bit R se reinicia cada {e.Config.IntervaloReinicioBitR} ticks. En clase el " +
+                "docente nunca lo hace, así que segunda oportunidad, reloj y NRU no van a dar " +
+                "lo mismo que en la pizarra. Ponelo en 0 para resolver ejercicios."));
 
         if (e.Config.AlgoritmoPlanificacion.Equals("Garantizada", StringComparison.OrdinalIgnoreCase))
         {

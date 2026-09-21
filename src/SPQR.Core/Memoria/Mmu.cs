@@ -89,7 +89,14 @@ public sealed class Mmu
         int marco;
         if (!MarcosLibres.EstaVacia)
         {
-            marco = MarcosLibres.QuitarDelInicio();
+            // Siempre el marco libre de número más bajo, como se llena la tabla
+            // en el pizarrón: marco 1, marco 2, marco 3… Importa cuando un
+            // proceso termina y deja huecos en el medio: el siguiente fallo
+            // ocupa el hueco más alto de la tabla, no el último que se liberó.
+            marco = int.MaxValue;
+            foreach (var libre in MarcosLibres) if (libre < marco) marco = libre;
+            var elegido = marco;
+            MarcosLibres.Quitar(m => m == elegido);
         }
         else
         {
@@ -126,6 +133,9 @@ public sealed class Mmu
             _algoritmo.AlLiberar(marco);
         }
 
+        // Todo fallo avisa, haya habido víctima o no. NRU limpia acá sus bits.
+        _algoritmo.AlFallar(Marcos);
+
         // --- cargar la página pedida ---
         Marcos[marco].Duenio = proceso;
         Marcos[marco].Pagina = pagina;
@@ -134,8 +144,10 @@ public sealed class Mmu
         entrada.Presente = true;
         entrada.Marco = marco;
         entrada.InstanteDeCarga = instante;
-        entrada.Referenciada = true;
-        entrada.Modificada = referencia.EsEscritura;
+        // Con qué bits entra la página lo decide el algoritmo: segunda
+        // oportunidad la carga con R = 0, NRU cuenta el fallo como modificación.
+        entrada.Referenciada = _algoritmo.BitRAlCargar;
+        entrada.Modificada = referencia.EsEscritura || _algoritmo.BitMAlCargar;
         entrada.InstanteUltimoUso = instante;
 
         _algoritmo.AlCargar(marco, instante);

@@ -204,21 +204,21 @@
                             <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Style="{StaticResource Def}" Text="Óptimo"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la página que tardará más en volver a usarse. Solo es posible porque la cadena de referencias completa se conoce de antemano. Sirve como cota superior."/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la página que tardará más en volver a usarse. Si varias ya no vuelven a aparecer, sale la que entró primero (regla del docente, 1 de septiembre). Solo es posible porque la cadena completa se conoce de antemano; sirve como cota superior."/>
                             <TextBlock Grid.Row="1" Style="{StaticResource Def}" Text="FIFO"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la que lleva más tiempo cargada, sin mirar si se usa. Es el único que sufre la anomalía de Belady."/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la que lleva más tiempo cargada, sin mirar si se usa. La nueva ocupa el marco de la que sale. Es el que sufre la anomalía de Belady: más marcos pueden dar más fallos."/>
                             <TextBlock Grid.Row="2" Style="{StaticResource Def}" Text="Segunda oportunidad"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}" Text="FIFO que, antes de desalojar, revisa el bit R del primero de la fila: si está encendido lo apaga y lo manda al final de la fila."/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Val}" Text="FIFO + bit R. La página entra con R = 0 y gana una vida (R = 1) cada vez que se vuelve a usar. Al reemplazar se recorre en orden de llegada: a la que tiene vida se le quita y se la salta, sin moverla de lugar; sale la primera con R = 0."/>
                             <TextBlock Grid.Row="3" Style="{StaticResource Def}" Text="Reloj"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Val}" Text="La misma idea, pero sobre una lista circular con una manecilla que avanza. No mueve elementos de lugar."/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Val}" Text="La página entra con R = 1. Una manecilla recorre los marcos en círculo: si apunta a R = 1 lo apaga y avanza; si apunta a R = 0, ese sale y la manecilla avanza. Mientras haya marcos libres, la manecilla no se mueve."/>
                             <TextBlock Grid.Row="4" Style="{StaticResource Def}" Text="NRU"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Val}" Text="Clasifica las páginas en cuatro clases según los bits R y M y desaloja una de la clase más baja que exista."/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Val}" Text="Clase = 2R + M, contando desde el último fallo. La página que entra por fallo queda en clase 3 (el fallo cuenta como modificación); un acierto le enciende R. En cada fallo se limpian los bits. Sale la de menor clase; si empatan, la que entró primero."/>
                             <TextBlock Grid.Row="5" Style="{StaticResource Def}" Text="LRU"/>
-                            <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la que lleva más tiempo sin ser usada. Es el que más se acerca al óptimo."/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource Val}" Text="Desaloja la que lleva más tiempo sin ser usada (mira el pasado, no el futuro). Es el que más se acerca al óptimo."/>
                         </Grid>
                         <Border Style="{StaticResource Aviso}">
                             <TextBlock Style="{StaticResource TextoAviso}"
-                                       Text="Los seis se programan, uno se elige. El docente aclaró que no se sabrá cuál hay que usar hasta el momento de la demostración, así que los seis tienen que estar terminados y funcionando. Y advirtió expresamente que segunda oportunidad y reloj son algoritmos distintos: llegan al mismo criterio por caminos diferentes y no se pueden contar como uno solo."/>
+                                       Text="Las reglas de los seis son las que el docente usó en la pizarra (clases del 1 y el 3 de septiembre), y el emulador reproduce sus ejemplos columna por columna. La diferencia entre segunda oportunidad y reloj la marcó él mismo: en segunda oportunidad la página entra con R = 0, en reloj entra con R = 1. Por eso dan resultados distintos."/>
                         </Border>
                     </StackPanel>
                 </Border>
@@ -228,7 +228,7 @@
                         <TextBlock Style="{StaticResource H}" Text="Bits R y M · clases de NRU"/>
                         <TextBlock Style="{StaticResource Sup}" Text="PANTALLA 4 · TABLA DE PAGINACIÓN"/>
                         <TextBlock Style="{StaticResource P}"
-                                   Text="Cada entrada de la tabla de páginas guarda dos banderas. R se enciende cuando la página se lee o se escribe; M se enciende solo cuando se escribe. La columna Clase combina las dos en cuatro categorías, que es exactamente lo que mira NRU:"/>
+                                   Text="Cada entrada de la tabla de páginas guarda dos banderas. R se enciende cuando la página se usa; M, cuando se modifica. En NRU el docente cuenta el fallo como modificación: la página que entra por fallo queda con R = 1 y M = 1. La columna Clase combina las dos en cuatro categorías, que es exactamente lo que mira NRU:"/>
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
@@ -244,7 +244,7 @@
                         <TextBlock Style="{StaticResource P}"
                                    Text="El bit M decide el costo del desalojo: si está encendido, la página se escribe al área de intercambio antes de liberar el marco; si está apagado, el marco se libera de inmediato porque la copia del disco sigue siendo válida. El informe cuenta esas escrituras por separado."/>
                         <TextBlock Style="{StaticResource P}"
-                                   Text="El sistema apaga los bits R cada cierto número de ticks (se configura en la pantalla 3). Sin esa limpieza, a los pocos instantes todas las páginas quedarían con R = 1 y la clasificación dejaría de distinguir nada."/>
+                                   Text="En NRU los bits se limpian en cada fallo: «no usada recientemente» se mide desde el último fallo. La pantalla 3 tiene además un reinicio periódico del bit R, pero viene en 0 (apagado) porque el docente no lo usa en sus ejercicios; si se enciende, segunda oportunidad, reloj y NRU dejan de coincidir con la pizarra."/>
                     </StackPanel>
                 </Border>
 

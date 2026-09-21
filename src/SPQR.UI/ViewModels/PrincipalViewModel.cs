@@ -564,6 +564,19 @@ public sealed class PrincipalViewModel : BaseViewModel
         var filas = new List<FilaHistorial>();
         for (var i = 0; i < Config.MarcosFisicos; i++) filas.Add(new FilaHistorial { Marco = i });
 
+        // Con un solo proceso —el caso de un ejercicio de clase, una cadena y
+        // N marcos— la cuadrícula se rotula como en la pizarra: «1, 2, 3…», no
+        // «A1, A2, A3…». Con varios procesos hace falta la letra para saber de
+        // quién es cada página.
+        var procesoUnico = -1;
+        var variosProcesos = false;
+        foreach (var foto in _resultado.Memoria)
+        {
+            if (!foto.HuboAcceso) continue;
+            if (procesoUnico < 0) procesoUnico = foto.ProcesoIdEnCpu;
+            else if (foto.ProcesoIdEnCpu != procesoUnico) { variosProcesos = true; break; }
+        }
+
         var fallos = 0;
         var referencias = 0;
 
@@ -578,7 +591,7 @@ public sealed class PrincipalViewModel : BaseViewModel
             Referencias.Add(new CeldaReferencia
             {
                 Instante = foto.Instante,
-                Texto = foto.Etiqueta,
+                Texto = variosProcesos || !foto.HuboAcceso ? foto.Etiqueta : foto.PaginaReferenciada.ToString(),
                 ProcesoId = foto.ProcesoIdEnCpu,
                 Fallo = null,                      // el encabezado se pinta por proceso
             });
@@ -600,7 +613,9 @@ public sealed class PrincipalViewModel : BaseViewModel
                     ProcesoId = m?.ProcesoId ?? 0,
                     Pagina = m?.Pagina ?? -1,
                     BitR = m?.BitR == true ? 1 : 0,
-                    Texto = m is null || m.Libre ? "" : $"{m.Proceso}{m.Pagina}",
+                    Texto = m is null || m.Libre ? ""
+                          : variosProcesos ? $"{m.Proceso}{m.Pagina}"
+                          : m.Pagina.ToString(),
                     RecienCargada = foto.Fallo == true && foto.MarcoReferenciado == i,
                 });
             }
@@ -610,10 +625,12 @@ public sealed class PrincipalViewModel : BaseViewModel
         // es una lista común y no avisa de los cambios (ver ArmarLineaDeTiempo).
         foreach (var fila in filas) HistorialPaginacion.Add(fila);
 
+        // Rendimiento = 1 − F, con F = fallos ÷ referencias. Se muestra la cuenta
+        // entera, igual que en la pizarra: «F = 7/15 = 0.4667 → 53.33 %».
         var f = referencias == 0 ? 0 : (double)fallos / referencias;
         ReferenciasFinalTexto = referencias.ToString();
-        FallosFinalTexto = $"{fallos} de {referencias}";
-        RendimientoFinalTexto = $"{Math.Round((1 - f) * 100, 1)} %";
+        FallosFinalTexto = $"F = {fallos}/{referencias} = {f:0.0000}";
+        RendimientoFinalTexto = $"{(1 - f) * 100:0.00} %";
     }
 
     private int _columnaActual = -1;

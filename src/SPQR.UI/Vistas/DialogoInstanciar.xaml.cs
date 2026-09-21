@@ -15,10 +15,10 @@ namespace SPQR.UI.Vistas;
 ///
 /// La ráfaga arranca igualada al largo de la cadena de referencias del
 /// programa elegido. No es un detalle cosmético: cada tick de CPU dispara
-/// exactamente un acceso a memoria, así que una ráfaga distinta al largo de
-/// la cadena trunca la cadena o la recicla, y el rendimiento termina midiendo
-/// otra cosa. Si el usuario escribe un valor propio, el diálogo lo respeta y
-/// deja de sugerir.
+/// exactamente un acceso a memoria, así que para resolver un ejercicio de
+/// clase la ráfaga tiene que ser el largo de la cadena; si es más corta, las
+/// últimas referencias no se simulan. Si el usuario escribe un valor propio,
+/// el diálogo lo respeta y deja de sugerir.
 /// </summary>
 public partial class DialogoInstanciar : Window
 {
@@ -102,18 +102,13 @@ public partial class DialogoInstanciar : Window
             return;
         }
 
-        var vueltas = rafaga / largo;
-        var sueltas = rafaga % largo;
-
-        PistaCadena.Text = sueltas == 0
-            ? vueltas == 1
-                ? $"La ráfaga coincide con las {largo} referencias de la cadena: se van a ver todas, una sola vez."
-                : $"Cadena de {largo} referencias · la ráfaga da {vueltas} vueltas completas. Está bien."
-            : vueltas == 0
-                ? $"Cadena de {largo} referencias con ráfaga {rafaga}: las últimas " +
-                  $"{largo - sueltas} no se van a tocar nunca. Usá un múltiplo de {largo}."
-                : $"Cadena de {largo} referencias con ráfaga {rafaga}: {vueltas} vueltas y " +
-                  $"{sueltas} referencia(s) sueltas, cortando la cadena. Usá un múltiplo de {largo}.";
+        PistaCadena.Text = rafaga == largo
+            ? $"La ráfaga coincide con las {largo} referencias de la cadena: se simulan todas, una vez."
+            : rafaga < largo
+                ? $"Ojo: la cadena tiene {largo} referencias y la ráfaga es {rafaga}. Las últimas " +
+                  $"{largo - rafaga} no se van a simular. Para un ejercicio, poné {largo}."
+                : $"La ráfaga ({rafaga}) es más larga que la cadena ({largo}): al terminarla vuelve a " +
+                  "empezar desde la primera referencia.";
     }
 
     private void Agregar_Click(object sender, RoutedEventArgs e)

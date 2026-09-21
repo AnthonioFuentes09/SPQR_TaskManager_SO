@@ -1,0 +1,58 @@
+﻿{
+  "Version": 1,
+  "Descripcion": "Escenario de SPQR Task Manager",
+  "GuardadoEl": "2026-09-21T15:02:44.4835153+00:00",
+  "Catalogo": [
+    {
+      "Id": "P1",
+      "Nombre": "Ejercicio 1-sep",
+      "TamanioEnPaginas": 8,
+      "CadenaTexto": "1, 2, 3, 3, 5, 1, 2, 2, 6, 2, 1, 5, 7, 6, 3",
+      "Prioridad": 1,
+      "Boletos": 10,
+      "PorcentajeAsignacion": 20
+    }
+  ],
+  "ListaDeEjecucion": [
+    {
+      "Id": 1,
+      "ProgramaId": "P1",
+      "Rafaga": 15,
+      "TiempoLlegada": 0,
+      "Cola": 1
+    }
+  ],
+  "Colas": [
+    {
+      "Numero": 1,
+      "Etiqueta": "Alta",
+      "Algoritmo": "RoundRobin",
+      "Quantum": 2
+    },
+    {
+      "Numero": 2,
+      "Etiqueta": "Media",
+      "Algoritmo": "Sjf",
+      "Quantum": 0
+    },
+    {
+      "Numero": 3,
+      "Etiqueta": "Baja",
+      "Algoritmo": "Fifo",
+      "Quantum": 0
+    }
+  ],
+  "Config": {
+    "Quantum": 3,
+    "MemoriaRamKb": 32,
+    "PaginasVirtuales": 8,
+    "MarcosFisicos": 4,
+    "TamanioPaginaKb": 4,
+    "DiscosDuros": 1,
+    "AreaDeIntercambio": 40,
+    "IntervaloReinicioBitR": 0,
+    "SemillaSorteo": 2026,
+    "AlgoritmoPlanificacion": "Fifo",
+    "AlgoritmoPaginacion": "Optimo"
+  }
+}

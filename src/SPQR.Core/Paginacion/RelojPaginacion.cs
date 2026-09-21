@@ -8,17 +8,25 @@ namespace SPQR.Core.Paginacion;
 ///   · si tiene R = 1 → se le apaga el bit y la manecilla avanza, sin mover
 ///     el marco de lugar.
 ///
-/// Diferencia con segunda oportunidad: el criterio de decisión es idéntico,
-/// pero acá NADA se reordena. No hay que sacar un nodo de la cabeza y
-/// reinsertarlo al final; solo avanza un índice. Es la misma idea implementada
-/// con un costo menor, y por eso se cuentan como dos algoritmos y no como uno.
+/// Mientras haya marcos libres la manecilla no se mueve: «el puntero
+/// permanece en su posición» (exposición del 3 de septiembre). Solo camina
+/// cuando hay que reemplazar.
+///
+/// Diferencia con segunda oportunidad, según el docente: «en el reloj, desde
+/// que entra, le coloca el bit en 1»; en segunda oportunidad entra en 0. Por
+/// eso esta clase deja el bit R = 1 al cargar (el valor por defecto de
+/// <see cref="IAlgoritmoPaginacion.BitRAlCargar"/>) y segunda oportunidad no.
+///
+/// Ejemplo de clase: 1,2,3,4,1,2,5,1,2,3,4,5 con 4 marcos → 10 fallos,
+/// 2 aciertos, rendimiento 17 %.
 /// </summary>
 public sealed class RelojPaginacion : IAlgoritmoPaginacion
 {
     private int _manecilla;
 
     public string Nombre => "Reloj";
-    public string Criterio => "Lista circular de marcos con una manecilla: R = 0 es víctima, R = 1 se apaga y se avanza.";
+    public string Criterio =>
+        "Entra con R = 1. Manecilla circular: si apunta a R = 1 lo apaga y avanza; si apunta a R = 0, ese sale y la manecilla avanza.";
 
     public void Reiniciar() => _manecilla = 0;
     public void AlCargar(int marco, int instante) { }
